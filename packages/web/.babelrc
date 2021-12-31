@@ -1,0 +1,37 @@
+{
+  "env": {
+    "development": {
+      "plugins": [
+        [
+          "babel-plugin-styled-components",
+          { "ssr": true, "displayName": true, "preprocess": false, 
+            "topLevelImportPaths": [
+            "@xstyled/styled-components"]
+           }
+        ]
+      ],
+      "presets": ["next/babel"]
+    },
+    "production": {
+      "plugins": [
+        [
+          "babel-plugin-styled-components",
+          { "ssr": true, "displayName": false, "preprocess": false,
+            "topLevelImportPaths": [
+              "@xstyled/styled-components"]
+          }
+        ]
+      ],
+      "presets": ["next/babel"]
+    }
+  },
+  "plugins": [
+    [
+      "babel-plugin-styled-components",
+      { "ssr": true, "displayName": true, "preprocess": false,
+        "topLevelImportPaths": [
+          "@xstyled/styled-components"]
+      }
+    ]
+  ]
+}

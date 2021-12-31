@@ -1,0 +1,5 @@
+mutation Signin($email: String!, $password: String!) {
+  signin(data: { email: $email, password: $password }) {
+    ...UserResponse
+  }
+}
