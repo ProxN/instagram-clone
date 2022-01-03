@@ -1,4 +1,8 @@
+import { useState } from 'react';
+import { useRouter } from 'next/router';
 import NextLink from 'next/link';
+import toast from 'react-hot-toast';
+import { useQueryClient } from 'react-query';
 import { Popover } from 'react-tiny-popover';
 import { Icon } from '@components/elements/Icon';
 import { Box } from '@components/layout/Box';
@@ -7,9 +11,13 @@ import { TextInput } from '@components/elements/TextInput';
 import { Space } from '@components/layout/Space';
 import { IconButton } from '@components/elements/IconButton';
 import { Avatar } from '@components/elements/Avatar';
-import { useState } from 'react';
-import { useRouter } from 'next/router';
 import { Text } from '@components/elements/Text';
+import { useLogoutMutation } from '@lib/graphql';
+import { client } from '@lib/utility/graphqlClient';
+
+interface HeaderProps {
+  avatar?: string | null;
+}
 
 const links = [
   {
@@ -35,10 +43,25 @@ const links = [
   },
 ];
 
-const Header: React.FC = () => {
+const Header: React.FC<HeaderProps> = ({ avatar }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const { mutate } = useLogoutMutation(client, {
+    onSuccess: (data) => {
+      if (data.logout) {
+        queryClient.invalidateQueries('Me');
+        toast.success('Successfully logged out!');
+        router.push('/');
+      }
+    },
+  });
+
+  const handleLogout = () => {
+    mutate({});
+  };
 
   return (
     <>
@@ -193,6 +216,7 @@ const Header: React.FC = () => {
                       </Flex>
                     </NextLink>
                     <Flex
+                      onClick={handleLogout}
                       cursor='pointer'
                       alignItems='center'
                       backgroundColor={{ hover: 'gray.0' }}
@@ -208,10 +232,7 @@ const Header: React.FC = () => {
               )}
             >
               <div>
-                <Avatar
-                  onClick={() => setShowAvatarMenu(true)}
-                  name='Ayoub Kan'
-                />
+                <Avatar src={avatar} onClick={() => setShowAvatarMenu(true)} />
               </div>
             </Popover>
           </Box>

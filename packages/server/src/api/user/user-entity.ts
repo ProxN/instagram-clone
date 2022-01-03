@@ -31,6 +31,9 @@ class User extends BaseEntity {
   @Column({ unique: true })
   username!: string;
 
+  @Column()
+  password!: string;
+
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   avatar?: string;
@@ -39,8 +42,13 @@ class User extends BaseEntity {
   @Column({ default: false })
   has_avatar?: boolean;
 
-  @Column()
-  password!: string;
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  website?: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  bio?: string;
 
   @Field(() => String)
   @CreateDateColumn()

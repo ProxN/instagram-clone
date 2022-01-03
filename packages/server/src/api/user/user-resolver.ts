@@ -20,11 +20,19 @@ class UserResolver {
 
   @Authorized()
   @Mutation(() => UserResponse)
-  async updateUser(
+  async updateProfile(
     @Arg('newUser') newUser: UpdateUserInput,
     @Ctx() { req }: Context
   ): Promise<UserResponse> {
+    const hasUsername = Object.prototype.hasOwnProperty.call(
+      newUser,
+      'username'
+    );
+    if (hasUsername && newUser.username?.length === 0) {
+      return { error: userErrors.usernameRequired };
+    }
     let updatedUser;
+
     try {
       await User.update({ id: req.session.userId }, newUser);
 
@@ -92,7 +100,6 @@ class UserResolver {
         .execute();
 
       updatedUser = result.raw[0];
-      return { user: updatedUser };
     } catch (error) {
       return {
         error: {

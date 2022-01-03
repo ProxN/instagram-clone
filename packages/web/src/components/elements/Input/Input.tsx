@@ -1,3 +1,4 @@
+import { InputMaybe } from '@lib/graphql';
 import { forwardRef } from '@lib/utility/forwardRef';
 import {
   DefaultInput,
@@ -22,7 +23,7 @@ export interface InputProps
   /** Add icon on left side of input */
   icon?: React.ReactNode;
 
-  value?: string;
+  value?: string | InputMaybe<string>;
 }
 
 const getInput = (variant: string) => {

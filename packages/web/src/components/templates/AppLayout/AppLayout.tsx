@@ -24,7 +24,7 @@ const AppLayout: React.FC = ({ children }) => {
 
   return (
     <>
-      {user?.me && <Header />}
+      {user?.me && <Header avatar={user.me.avatar} />}
       <Box as='main' h='100%' backgroundColor='gray.0'>
         {children}
       </Box>

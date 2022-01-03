@@ -4,4 +4,6 @@ fragment User on User {
   name
   username
   avatar
+  website
+  bio
 }

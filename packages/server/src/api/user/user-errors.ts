@@ -17,3 +17,8 @@ export const usernameAlreadyExists = {
   field: 'username',
   message: 'Username has already been taken.',
 };
+
+export const usernameRequired = {
+  field: 'username',
+  message: 'Please provide a username',
+};

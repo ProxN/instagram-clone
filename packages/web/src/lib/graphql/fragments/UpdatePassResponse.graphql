@@ -1,0 +1,6 @@
+fragment UpdatePassResponse on UpdatePassResponse {
+  error {
+    ...Error
+  }
+  updated
+}

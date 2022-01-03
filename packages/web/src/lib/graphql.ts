@@ -47,7 +47,7 @@ export type Mutation = {
   signup: UserResponse;
   updateAvatar: UserResponse;
   updatePassword: UpdatePassResponse;
-  updateUser: UserResponse;
+  updateProfile: UserResponse;
 };
 
 
@@ -83,7 +83,7 @@ export type MutationUpdatePasswordArgs = {
 };
 
 
-export type MutationUpdateUserArgs = {
+export type MutationUpdateProfileArgs = {
   newUser: UpdateUserInput;
 };
 
@@ -106,12 +106,16 @@ export type UpdatePassResponse = {
 };
 
 export type UpdateUserInput = {
+  bio?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
+  username?: InputMaybe<Scalars['String']>;
+  website?: InputMaybe<Scalars['String']>;
 };
 
 export type User = {
   __typename?: 'User';
   avatar?: Maybe<Scalars['String']>;
+  bio?: Maybe<Scalars['String']>;
   createdAt: Scalars['String'];
   email: Scalars['String'];
   has_avatar: Scalars['Boolean'];
@@ -119,6 +123,7 @@ export type User = {
   name: Scalars['String'];
   updatedAt: Scalars['String'];
   username: Scalars['String'];
+  website?: Maybe<Scalars['String']>;
 };
 
 export type UserResponse = {
@@ -127,11 +132,13 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
-export type UserResponseFragment = { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined } | null | undefined };
+export type UserResponseFragment = { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined, website?: string | null | undefined, bio?: string | null | undefined } | null | undefined };
 
 export type ErrorFragment = { __typename?: 'FieldError', field: string, message: string };
 
-export type UserFragment = { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined };
+export type UpdatePassResponseFragment = { __typename?: 'UpdatePassResponse', updated?: boolean | null | undefined, error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined };
+
+export type UserFragment = { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined, website?: string | null | undefined, bio?: string | null | undefined };
 
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
@@ -146,7 +153,7 @@ export type SigninMutationVariables = Exact<{
 }>;
 
 
-export type SigninMutation = { __typename?: 'Mutation', signin: { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined } | null | undefined } };
+export type SigninMutation = { __typename?: 'Mutation', signin: { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined, website?: string | null | undefined, bio?: string | null | undefined } | null | undefined } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -159,7 +166,7 @@ export type ResetPasswordMutationVariables = Exact<{
 }>;
 
 
-export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined } | null | undefined } };
+export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined, website?: string | null | undefined, bio?: string | null | undefined } | null | undefined } };
 
 export type SignupMutationVariables = Exact<{
   email: Scalars['String'];
@@ -169,19 +176,37 @@ export type SignupMutationVariables = Exact<{
 }>;
 
 
-export type SignupMutation = { __typename?: 'Mutation', signup: { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined } | null | undefined } };
+export type SignupMutation = { __typename?: 'Mutation', signup: { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined, website?: string | null | undefined, bio?: string | null | undefined } | null | undefined } };
 
 export type UpdateAvatarMutationVariables = Exact<{
   file: Scalars['Upload'];
 }>;
 
 
-export type UpdateAvatarMutation = { __typename?: 'Mutation', updateAvatar: { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined } | null | undefined } };
+export type UpdateAvatarMutation = { __typename?: 'Mutation', updateAvatar: { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined, website?: string | null | undefined, bio?: string | null | undefined } | null | undefined } };
+
+export type UpdatePasswordMutationVariables = Exact<{
+  oldPassword: Scalars['String'];
+  newPassword: Scalars['String'];
+}>;
+
+
+export type UpdatePasswordMutation = { __typename?: 'Mutation', updatePassword: { __typename?: 'UpdatePassResponse', updated?: boolean | null | undefined, error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined } };
+
+export type UpdateProfileMutationVariables = Exact<{
+  name?: InputMaybe<Scalars['String']>;
+  username?: InputMaybe<Scalars['String']>;
+  website?: InputMaybe<Scalars['String']>;
+  bio?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile: { __typename?: 'UserResponse', error?: { __typename?: 'FieldError', field: string, message: string } | null | undefined, user?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined, website?: string | null | undefined, bio?: string | null | undefined } | null | undefined } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined } | null | undefined };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, email: string, name: string, username: string, avatar?: string | null | undefined, website?: string | null | undefined, bio?: string | null | undefined } | null | undefined };
 
 export const ErrorFragmentDoc = `
     fragment Error on FieldError {
@@ -196,6 +221,8 @@ export const UserFragmentDoc = `
   name
   username
   avatar
+  website
+  bio
 }
     `;
 export const UserResponseFragmentDoc = `
@@ -209,6 +236,14 @@ export const UserResponseFragmentDoc = `
 }
     ${ErrorFragmentDoc}
 ${UserFragmentDoc}`;
+export const UpdatePassResponseFragmentDoc = `
+    fragment UpdatePassResponse on UpdatePassResponse {
+  error {
+    ...Error
+  }
+  updated
+}
+    ${ErrorFragmentDoc}`;
 export const ForgotPasswordDocument = `
     mutation ForgotPassword($email: String!) {
   forgotPassword(email: $email) {
@@ -330,6 +365,48 @@ export const useUpdateAvatarMutation = <
     useMutation<UpdateAvatarMutation, TError, UpdateAvatarMutationVariables, TContext>(
       'UpdateAvatar',
       (variables?: UpdateAvatarMutationVariables) => fetcher<UpdateAvatarMutation, UpdateAvatarMutationVariables>(client, UpdateAvatarDocument, variables, headers)(),
+      options
+    );
+export const UpdatePasswordDocument = `
+    mutation UpdatePassword($oldPassword: String!, $newPassword: String!) {
+  updatePassword(oldPassword: $oldPassword, newPassword: $newPassword) {
+    ...UpdatePassResponse
+  }
+}
+    ${UpdatePassResponseFragmentDoc}`;
+export const useUpdatePasswordMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(
+      client: GraphQLClient,
+      options?: UseMutationOptions<UpdatePasswordMutation, TError, UpdatePasswordMutationVariables, TContext>,
+      headers?: RequestInit['headers']
+    ) =>
+    useMutation<UpdatePasswordMutation, TError, UpdatePasswordMutationVariables, TContext>(
+      'UpdatePassword',
+      (variables?: UpdatePasswordMutationVariables) => fetcher<UpdatePasswordMutation, UpdatePasswordMutationVariables>(client, UpdatePasswordDocument, variables, headers)(),
+      options
+    );
+export const UpdateProfileDocument = `
+    mutation UpdateProfile($name: String, $username: String, $website: String, $bio: String) {
+  updateProfile(
+    newUser: {name: $name, username: $username, website: $website, bio: $bio}
+  ) {
+    ...UserResponse
+  }
+}
+    ${UserResponseFragmentDoc}`;
+export const useUpdateProfileMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(
+      client: GraphQLClient,
+      options?: UseMutationOptions<UpdateProfileMutation, TError, UpdateProfileMutationVariables, TContext>,
+      headers?: RequestInit['headers']
+    ) =>
+    useMutation<UpdateProfileMutation, TError, UpdateProfileMutationVariables, TContext>(
+      'UpdateProfile',
+      (variables?: UpdateProfileMutationVariables) => fetcher<UpdateProfileMutation, UpdateProfileMutationVariables>(client, UpdateProfileDocument, variables, headers)(),
       options
     );
 export const MeDocument = `
