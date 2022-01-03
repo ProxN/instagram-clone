@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 import toast from 'react-hot-toast';
@@ -58,6 +58,19 @@ const Header: React.FC<HeaderProps> = ({ avatar }) => {
       }
     },
   });
+
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setShowAvatarMenu(false);
+      setShowMenu(false);
+    };
+
+    router.events.on('routeChangeStart', handleRouteChange);
+
+    return () => {
+      router.events.off('routeChangeStart', handleRouteChange);
+    };
+  }, [router]);
 
   const handleLogout = () => {
     mutate({});
