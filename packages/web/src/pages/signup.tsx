@@ -22,14 +22,22 @@ const SignupSchema = yup
       .min(8, 'Password must be at least 8 characters')
       .required(),
     name: yup.string().required(),
+    username: yup.string().required(),
   })
   .required();
 
 const SignUp = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { control, handleSubmit } = useForm<SignupInputs>({
+  const { control, handleSubmit, formState } = useForm<SignupInputs>({
     resolver: yupResolver(SignupSchema),
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+      password: '',
+      username: '',
+      name: '',
+    },
   });
 
   const { mutate, isLoading } = useSignupMutation(client, {
@@ -38,10 +46,10 @@ const SignUp = () => {
         toast.error(data.signup.error.message);
       }
       if (data.signup.user) {
-        queryClient.setQueryData<MeQuery>(['Me', null], {
+        queryClient.setQueryData<MeQuery>(['Me'], {
           me: data.signup.user,
         });
-        router.push('/');
+        router.push('/home');
       }
     },
   });
@@ -55,8 +63,22 @@ const SignUp = () => {
       <Controller
         render={({ field, fieldState: { error, invalid } }) => (
           <TextInput
-            placeholder='Enter your name'
-            label='Name'
+            placeholder='Enter your email'
+            label='Email'
+            id='email'
+            isInvalid={invalid}
+            error={error?.message}
+            {...field}
+          />
+        )}
+        name='email'
+        control={control}
+      />
+      <Controller
+        render={({ field, fieldState: { error, invalid } }) => (
+          <TextInput
+            placeholder='Enter your fullname'
+            label='Fullname'
             id='name'
             error={error?.message}
             isInvalid={invalid}
@@ -69,15 +91,15 @@ const SignUp = () => {
       <Controller
         render={({ field, fieldState: { error, invalid } }) => (
           <TextInput
-            placeholder='Enter your email'
-            label='Email'
-            id='email'
-            isInvalid={invalid}
+            placeholder='Enter your username'
+            label='Username'
+            id='username'
             error={error?.message}
+            isInvalid={invalid}
             {...field}
           />
         )}
-        name='email'
+        name='username'
         control={control}
       />
       <Controller
@@ -96,7 +118,13 @@ const SignUp = () => {
         control={control}
       />
 
-      <Button isLoading={isLoading} type='submit' radius='sm' isPrimary>
+      <Button
+        isDisabled={!formState.isValid || isLoading}
+        isLoading={isLoading}
+        type='submit'
+        radius='sm'
+        isPrimary
+      >
         Sign Up
       </Button>
     </AuthForm>

@@ -17,7 +17,7 @@ const WithNoUser = <P extends Record<string, unknown>>(
 
     useEffect(() => {
       if (isLoading || !user?.me) return;
-      router.push(redirect || '/');
+      router.push(redirect || '/home');
     }, [isLoading, router, user]);
 
     if (isLoading || user?.me) {

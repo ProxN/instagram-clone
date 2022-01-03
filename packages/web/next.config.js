@@ -21,6 +21,7 @@ module.exports = (phase) => {
       domains: [
         'avatars.githubusercontent.com',
         'instagram.fcmn2-2.fna.fbcdn.net',
+        'res.cloudinary.com',
       ],
     },
     webpack(config) {

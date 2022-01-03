@@ -1,10 +1,12 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { getConnection } from 'typeorm';
+import { GraphQLUpload } from 'graphql-upload';
+import { deleteFile, Upload, uploadFile } from '../../lib/upload';
 import { Context } from '../../types/context';
-import { UserResponse } from '../shared/user.response';
-import * as userErrors from './user.errors';
-import { UpdateUserInput } from './inputs/updateUser.input';
-import User from './user.entity';
-import { UpdatePassResponse } from './response/updatePass.response';
+import * as userErrors from './user-errors';
+import User from './user-entity';
+import { UpdatePassResponse, UpdateUserInput } from '../../types/user';
+import { UserResponse } from '../../types/shared';
 
 @Resolver()
 class UserResolver {
@@ -60,6 +62,46 @@ class UserResolver {
     await user?.save();
 
     return { updated: true };
+  }
+
+  @Authorized()
+  @Mutation(() => UserResponse)
+  async updateAvatar(
+    @Arg('file', () => GraphQLUpload) file: Upload,
+    @Ctx() { req }: Context
+  ): Promise<UserResponse> {
+    let updatedUser;
+    try {
+      const res = await uploadFile(file, 'avatar');
+
+      const user = await User.findOne({ where: { id: req.session.userId } });
+      if (user && user.has_avatar && user.avatar) {
+        const splitUrl = user.avatar.split('/');
+        const public_id = splitUrl[splitUrl.length - 1].split('.')[0];
+        await deleteFile(`avatar/${public_id}`);
+      }
+      const result = await getConnection()
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          avatar: res.secure_url,
+          has_avatar: true,
+        })
+        .where('id = :userId', { userId: req.session.userId })
+        .returning('*')
+        .execute();
+
+      updatedUser = result.raw[0];
+      return { user: updatedUser };
+    } catch (error) {
+      return {
+        error: {
+          field: 'avatar',
+          message: 'Something went worng! Please Try again.',
+        },
+      };
+    }
+    return { user: updatedUser };
   }
 }
 

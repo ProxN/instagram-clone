@@ -6,6 +6,8 @@ import express from 'express';
 import session from 'express-session';
 import { buildSchema } from 'type-graphql';
 import { ApolloServer } from 'apollo-server-express';
+import expressPlayground from 'graphql-playground-middleware-express';
+import { graphqlUploadExpress } from 'graphql-upload';
 import cookieParser from 'cookie-parser';
 import connectRedis from 'connect-redis';
 import Redis from 'ioredis';
@@ -44,7 +46,8 @@ const Main = async () => {
   const redis = new Redis('127.0.0.1:6379');
 
   app.set('trust proxy', 1);
-  app.use(helmet());
+  app.use(helmet({ contentSecurityPolicy: IS_PROD ? undefined : false }));
+  app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
   app.use(
     cors({
       origin: [CORS_ORIGIN, 'http://localhost:3000'],
@@ -87,6 +90,7 @@ const Main = async () => {
 
   await apolloServer.start();
 
+  app.get('/graphql', expressPlayground({ endpoint: '/graphql' }));
   apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(PORT, () => logger.info(`> Ready on http://localhost:${PORT}`));

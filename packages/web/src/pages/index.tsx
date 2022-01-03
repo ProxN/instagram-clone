@@ -1,72 +1,104 @@
-import Link from 'next/link';
+import Router from 'next/router';
+import Head from 'next/head';
+import * as yup from 'yup';
 import toast from 'react-hot-toast';
+import { Controller, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
-import { useMeQuery, useLogoutMutation } from '@lib/graphql';
+import { yupResolver } from '@hookform/resolvers/yup/dist/yup';
+import { WithNoUser } from '@lib/utility/withNoUser';
 import { client } from '@lib/utility/graphqlClient';
+import { LoginInputs, useSigninMutation, MeQuery } from '@lib/graphql';
 import { Button } from '@components/elements/Button';
-import { Heading } from '@components/elements/Heading';
-import { Box } from '@components/layout/Box';
-import { Center } from '@components/layout/Center';
-import { Space } from '@components/layout/Space';
-import { Loader } from '@components/elements/Loader';
+import { TextInput } from '@components/elements/TextInput';
+import { AuthForm } from '@components/templates/AuthForm';
 
-const Index = () => {
+const LoginSchema = yup
+  .object({
+    email: yup
+      .string()
+      .email('You have entered an invalid email address. Please try again.')
+      .required(),
+    password: yup
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .required(),
+  })
+  .required();
+
+const Login = () => {
   const queryClient = useQueryClient();
-  const { data: user, isLoading } = useMeQuery(client, undefined, {
-    staleTime: 1000 * 60 * 60 * 24,
+  const { control, handleSubmit, formState } = useForm<LoginInputs>({
+    resolver: yupResolver(LoginSchema),
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
-
-  const { mutate, isLoading: logoutLoading } = useLogoutMutation(client, {
+  const { mutate, isLoading } = useSigninMutation(client, {
     onSuccess: (data) => {
-      if (data.logout) {
-        queryClient.invalidateQueries('Me');
-        toast.success('Successfully logged out!');
+      if (data.signin.error) {
+        toast.error(data.signin.error.message);
+      }
+      if (data.signin.user) {
+        queryClient.setQueryData<MeQuery>(['Me'], {
+          me: data.signin.user,
+        });
+        Router.push('/home');
       }
     },
   });
 
+  const onSubmit = (inputs: LoginInputs) => {
+    mutate(inputs);
+  };
+
   return (
-    <Box>
-      <Center minH='100vh'>
-        {isLoading ? (
-          <Loader />
-        ) : user?.me ? (
-          <Box>
-            <Heading mb={2} as='h1' size={{ xs: '2xl', md: '3xl' }}>
-              Hello, {user?.me.name}!
-            </Heading>
-            <Center>
-              <Button
-                isLoading={logoutLoading}
-                onClick={() => mutate({})}
-                variant='outline'
-              >
-                logout
-              </Button>
-            </Center>
-          </Box>
-        ) : (
-          <Box>
-            <Heading as='h1' size={{ xs: '3xl', md: '4xl' }}>
-              Welcome to the Fullstack boilerplate
-            </Heading>
-            <Space mt='1rem' justifyContent='center'>
-              <Link passHref href='/login'>
-                <Button as='a' variant='ghost'>
-                  Log in
-                </Button>
-              </Link>
-              <Link passHref href='/signup'>
-                <Button as='a' color='violet'>
-                  Sign up
-                </Button>
-              </Link>
-            </Space>
-          </Box>
+    <AuthForm onSubmit={handleSubmit(onSubmit)} title='Log in.'>
+      <Head>
+        <title>Fullstack boilerplate - Login</title>
+      </Head>
+      <Controller
+        render={({ field, fieldState: { error, invalid } }) => (
+          <TextInput
+            placeholder='Enter your email'
+            label='Email'
+            id='email'
+            isInvalid={invalid}
+            error={error?.message}
+            {...field}
+          />
         )}
-      </Center>
-    </Box>
+        name='email'
+        control={control}
+      />
+      <Controller
+        render={({ field, fieldState: { error, invalid } }) => (
+          <TextInput
+            placeholder='Enter your password'
+            type='password'
+            label='Password'
+            id='password'
+            error={error?.message}
+            isInvalid={invalid}
+            {...field}
+          />
+        )}
+        name='password'
+        control={control}
+      />
+
+      <Button
+        isDisabled={!formState.isValid || isLoading}
+        isLoading={isLoading}
+        type='submit'
+        radius='sm'
+        isPrimary
+      >
+        login
+      </Button>
+    </AuthForm>
   );
 };
 
-export default Index;
+export default WithNoUser(Login);

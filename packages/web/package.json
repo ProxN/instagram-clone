@@ -58,6 +58,7 @@
     "react-hook-form": "^7.20.2",
     "react-hot-toast": "^2.1.1",
     "react-query": "^3.33.4",
+    "react-tiny-popover": "^7.0.1",
     "styled-components": "^5.3.3",
     "yup": "^0.32.11"
   }

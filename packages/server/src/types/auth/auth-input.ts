@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+
 @InputType()
 export class LoginInputs {
   @Field()
@@ -12,4 +13,6 @@ export class LoginInputs {
 export class SignupInputs extends LoginInputs {
   @Field()
   name!: string;
+  @Field()
+  username!: string;
 }

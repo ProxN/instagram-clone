@@ -13,6 +13,11 @@ export const PasswordLength = {
   message: 'Password length must be greater than 8',
 };
 
+export const UsernameAlreadyExists = {
+  field: 'username',
+  message: 'Username has already been taken.',
+};
+
 export const IncorrectEmailOrPassword = {
   field: 'emailOrPassword',
   message: 'Email or Password is incorrect!',

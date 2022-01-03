@@ -3,6 +3,7 @@ import { Feed } from '@components/templates/Feed';
 import Stories from '@components/templates/Stories/Stories';
 import { Suggestions } from '@components/templates/Suggestions';
 import { useShow } from '@lib/hooks/useShow';
+import { withUser } from '@lib/utility/withUser';
 
 const Home = () => {
   const { showSuggestions } = useShow(['lg', 'xl']);
@@ -25,4 +26,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default withUser(Home);

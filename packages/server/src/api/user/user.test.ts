@@ -1,9 +1,9 @@
 import { Connection } from 'typeorm';
 import { expect } from 'chai';
-import testConnection from '../../lib/testConnection';
-import graphqlCall from '../../lib/graphqlCall';
-import User from './user.entity';
-import * as userErrors from './user.errors';
+import testConnection from '../../lib/test-connection';
+import graphqlCall from '../../lib/graphql-call';
+import User from './user-entity';
+import * as userErrors from './user-errors';
 
 const meQuery = `
     {

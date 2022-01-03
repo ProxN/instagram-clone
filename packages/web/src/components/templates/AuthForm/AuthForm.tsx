@@ -13,7 +13,7 @@ const info = {
   },
   signup: {
     text: 'Adready have an account?',
-    href: '/login',
+    href: '/',
     linkText: 'Log in',
   },
 };
@@ -33,8 +33,14 @@ const AuthForm: React.FC<AuthFormProps> = ({
   onSubmit,
 }) => {
   return (
-    <Center minH='100vh'>
-      <Box w={{ xs: '100%', sm: '40rem' }}>
+    <Center minH='100vh' backgroundColor='gray.0'>
+      <Box
+        w={{ xs: '100%', sm: '35rem' }}
+        backgroundColor='#fff'
+        border='1px solid'
+        borderColor='blackAlpha.3'
+        padding='2rem 3rem'
+      >
         <Heading as='h1' size='3xl'>
           {title}
         </Heading>
@@ -45,7 +51,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
             {hideLinks ? (
               ''
             ) : page === 'forgot_password' ? (
-              <Link passHref href='/login'>
+              <Link passHref href='/'>
                 <Text as='a' isLink>
                   Back to Login
                 </Text>

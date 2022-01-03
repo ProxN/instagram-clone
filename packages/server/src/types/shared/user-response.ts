@@ -1,6 +1,6 @@
 import { Field, ObjectType } from 'type-graphql';
-import { ErrorResponse } from './errorResponse';
-import User from '../user/user.entity';
+import { ErrorResponse } from './error-response';
+import User from '../../api/user/user-entity';
 
 @ObjectType()
 export class UserResponse extends ErrorResponse {

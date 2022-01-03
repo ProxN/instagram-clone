@@ -1,5 +1,5 @@
 import { Field, ObjectType } from 'type-graphql';
-import { ErrorResponse } from '../../shared/errorResponse';
+import { ErrorResponse } from '../shared';
 
 @ObjectType()
 export class UpdatePassResponse extends ErrorResponse {

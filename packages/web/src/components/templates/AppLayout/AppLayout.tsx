@@ -11,15 +11,21 @@ import {
 import { Text } from '@components/elements/Text';
 import { Box } from '@components/layout/Box';
 import { Flex } from '@components/layout/Flex';
+import { useMeQuery } from '@lib/graphql';
+import { client } from '@lib/utility/graphqlClient';
 import { useRouter } from 'next/router';
 import Header from './Header/Header';
 
 const AppLayout: React.FC = ({ children }) => {
   const router = useRouter();
+  const { data: user } = useMeQuery(client, undefined, {
+    staleTime: 1000 * 60 * 60 * 24,
+  });
+
   return (
     <>
-      <Header />
-      <Box as='main' backgroundColor='gray.0'>
+      {user?.me && <Header />}
+      <Box as='main' h='100%' backgroundColor='gray.0'>
         {children}
       </Box>
       {/* Create new Post */}

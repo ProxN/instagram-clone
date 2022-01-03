@@ -20,6 +20,7 @@ const TextArea: React.FC<TextAreaProps> = ({
         id={id}
         isRequired={isRequired}
         icon={icon}
+        padding='.5rem 1.2rem'
         {...inputProps}
       />
     </InputWrapper>

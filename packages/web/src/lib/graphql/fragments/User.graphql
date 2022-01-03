@@ -2,4 +2,6 @@ fragment User on User {
   id
   email
   name
+  username
+  avatar
 }

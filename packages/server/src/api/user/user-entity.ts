@@ -27,6 +27,18 @@ class User extends BaseEntity {
   @Column({ unique: true })
   email!: string;
 
+  @Field()
+  @Column({ unique: true })
+  username!: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  avatar?: string;
+
+  @Field()
+  @Column({ default: false })
+  has_avatar?: boolean;
+
   @Column()
   password!: string;
 

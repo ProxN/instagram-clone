@@ -16,11 +16,8 @@ const withUser = <P extends Record<string, unknown>>(
 
     useEffect(() => {
       if (isLoading) return;
-      if (!user?.me) {
-        router.push('/login');
-        return;
-      }
-      return;
+      if (user && user.me) return;
+      router.push('/');
     }, [isLoading, router, user]);
 
     if (isLoading || !user?.me) {

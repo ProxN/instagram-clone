@@ -1,9 +1,9 @@
 import { Connection } from 'typeorm';
 import { expect } from 'chai';
-import testConnection, { RedisMock } from '../../lib/testConnection';
-import graphqlCall from '../../lib/graphqlCall';
-import User from '../user/user.entity';
-import * as authErros from './auth.errors';
+import testConnection, { RedisMock } from '../../lib/test-connection';
+import graphqlCall from '../../lib/graphql-call';
+import User from '../user/user-entity';
+import * as authErros from './auth-errors';
 
 const signupMutation = `
     mutation Signup($email:String!,$password:String!,$name:String!){

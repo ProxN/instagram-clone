@@ -1,4 +1,5 @@
 import NextLink from 'next/link';
+import { Popover } from 'react-tiny-popover';
 import { Icon } from '@components/elements/Icon';
 import { Box } from '@components/layout/Box';
 import { Flex } from '@components/layout/Flex';
@@ -8,6 +9,7 @@ import { IconButton } from '@components/elements/IconButton';
 import { Avatar } from '@components/elements/Avatar';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { Text } from '@components/elements/Text';
 
 const links = [
   {
@@ -35,6 +37,7 @@ const links = [
 
 const Header: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const router = useRouter();
 
   return (
@@ -44,11 +47,11 @@ const Header: React.FC = () => {
           padding={{ xs: '0 1.5rem', md: '0 2.5rem' }}
           h='100%'
           justifyContent='space-between'
-          onClick={() => setShowMenu(!showMenu)}
           alignItems='center'
         >
           <Box display={{ xs: 'flex', md: 'none' }}>
             <IconButton
+              onClick={() => setShowMenu(!showMenu)}
               size='md'
               ariaLabel='menu'
               icon={<Icon name='menu' />}
@@ -85,7 +88,11 @@ const Header: React.FC = () => {
               left={{ md: '50%' }}
               transform={{ md: 'translateX(-50%)' }}
             >
-              <TextInput placeholder='Search' icon={<Icon name='search' />} />
+              <TextInput
+                placeholder='Search'
+                icon={<Icon name='search' />}
+                defaultValue=''
+              />
             </Box>
             <Space
               justifyContent={{ xs: 'space-between', md: 'flex-end' }}
@@ -129,7 +136,84 @@ const Header: React.FC = () => {
             </Space>
           </Box>
           <Box ml={{ md: '1.6rem' }}>
-            <Avatar name='Ayoub Kan' />
+            <Popover
+              isOpen={showAvatarMenu}
+              positions={['bottom', 'left']}
+              align='end'
+              reposition={false}
+              onClickOutside={() => setShowAvatarMenu(false)}
+              padding={10}
+              containerStyle={{ zIndex: '9999' }}
+              content={() => (
+                <Box
+                  backgroundColor='white'
+                  borderRadius='sm'
+                  boxShadow='sm'
+                  minW='20rem'
+                  border='1px solid'
+                  borderColor='blackAlpha.1'
+                >
+                  <Flex flexDirection='column' fontSize='1.6rem'>
+                    <Flex
+                      backgroundColor={{ hover: 'gray.0' }}
+                      cursor='pointer'
+                      alignItems='center'
+                      fontWeight='semibold'
+                      padding='.8rem 1.5rem'
+                    >
+                      <Box>
+                        <Icon name='user' />
+                      </Box>
+                      <Text ml='1rem'>Profile</Text>
+                    </Flex>
+                    <Flex
+                      cursor='pointer'
+                      backgroundColor={{ hover: 'gray.0' }}
+                      alignItems='center'
+                      fontWeight='semibold'
+                      padding='.8rem 1.5rem'
+                    >
+                      <Box>
+                        <Icon name='bookmark' />
+                      </Box>
+                      <Text ml='1rem'>Saved</Text>
+                    </Flex>
+                    <NextLink href='/accounts/edit'>
+                      <Flex
+                        cursor='pointer'
+                        backgroundColor={{ hover: 'gray.0' }}
+                        alignItems='center'
+                        fontWeight='semibold'
+                        padding='.8rem 1.5rem'
+                      >
+                        <Box>
+                          <Icon name='settings' />
+                        </Box>
+                        <Text ml='1rem'>Settings</Text>
+                      </Flex>
+                    </NextLink>
+                    <Flex
+                      cursor='pointer'
+                      alignItems='center'
+                      backgroundColor={{ hover: 'gray.0' }}
+                      fontWeight='semibold'
+                      padding='.8rem .6rem'
+                      borderTop='1px solid transparent'
+                      borderColor='blackAlpha.3'
+                    >
+                      <Text ml='1rem'>Log out</Text>
+                    </Flex>
+                  </Flex>
+                </Box>
+              )}
+            >
+              <div>
+                <Avatar
+                  onClick={() => setShowAvatarMenu(true)}
+                  name='Ayoub Kan'
+                />
+              </div>
+            </Popover>
           </Box>
         </Flex>
       </Box>

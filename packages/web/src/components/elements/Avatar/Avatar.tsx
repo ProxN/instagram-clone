@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { useMemo } from 'react';
+import { Loader } from '../Loader';
 import { AvatarContaienr, AvatarStyleProps } from './Avatar.styles';
 
 const SplitName = (name: string) => {
@@ -9,7 +10,7 @@ const SplitName = (name: string) => {
 
 interface AvatarProps extends AvatarStyleProps {
   /* The src attribute for the img element. */
-  src?: string;
+  src?: string | null;
 
   /* Used in combination with src to provide an alt attribute for the rendered img element. */
   alt?: string;
@@ -20,12 +21,15 @@ interface AvatarProps extends AvatarStyleProps {
   name?: string;
 
   onClick?: () => void;
+
+  isLoading?: boolean;
 }
 
 const Avatar: React.FC<AvatarProps> = ({
   size = 'md',
   isCircle = true,
   addBorder = false,
+  isLoading,
   src,
   imgProps,
   alt,
@@ -50,9 +54,18 @@ const Avatar: React.FC<AvatarProps> = ({
         <span>{mmemoizedName}</span>
       ) : (
         src && (
-          <Image height='100%' width='100%' src={src} alt={alt} {...imgProps} />
+          <>
+            <Image
+              height='100%'
+              width='100%'
+              src={src}
+              alt={alt}
+              {...imgProps}
+            />
+          </>
         )
       )}
+      {isLoading && <Loader />}
     </AvatarContaienr>
   );
 };
