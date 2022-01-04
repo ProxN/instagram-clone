@@ -44,6 +44,7 @@ const TextInput = forwardRef<TextInputProps, 'input'>((props, ref) => {
     isRequired,
     error,
     type = 'text',
+
     ...inputProps
   } = props;
 

@@ -93,8 +93,10 @@ export const ModalContent: React.FC = ({ children }) => {
       zIndex={999}
     >
       <ModalContainer
-        maxW={size ? sizes[size] : sizes.md}
-        minH={size === 'full' ? '100vh' : ''}
+        style={{
+          maxWidth: size ? sizes[size] : sizes.md,
+          minHeight: size === 'full' ? '100vh' : '',
+        }}
         variants={ScaleFade}
         animate='enter'
         exit='exit'
@@ -130,9 +132,12 @@ export const CloseModalButton = () => {
   );
 };
 
-export const ModalBody: React.FC = ({ children }) => {
+export const ModalBody: React.FC<{ padding?: string }> = ({
+  children,
+  padding,
+}) => {
   return (
-    <Box flex='1' padding='1rem 1.4rem'>
+    <Box flex='1' padding={padding || '1rem 1.4rem'}>
       {children}
     </Box>
   );

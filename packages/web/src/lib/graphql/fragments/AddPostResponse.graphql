@@ -1,0 +1,8 @@
+fragment AddPostResponse on AddPostResponse {
+  error {
+    ...Error
+  }
+  post {
+    ...Post
+  }
+}

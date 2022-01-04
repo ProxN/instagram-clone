@@ -6,11 +6,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+import Post from '../post/post-entity';
 
 @ObjectType()
 @Entity()
@@ -49,6 +51,9 @@ class User extends BaseEntity {
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   bio?: string;
+
+  @OneToMany(() => Post, (post) => post.user_id)
+  posts?: Post[];
 
   @Field(() => String)
   @CreateDateColumn()

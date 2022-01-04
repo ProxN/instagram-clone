@@ -1,4 +1,4 @@
-import styled, { css } from '@xstyled/styled-components';
+import styled from '@xstyled/styled-components';
 import { motion } from 'framer-motion';
 import { mode } from '@lib/utility/component';
 
@@ -16,10 +16,7 @@ export const Overylay = styled(motion.div)`
     )(theme.colorMode)};
 `;
 
-export const ModalContainer = styled(motion.div)<{
-  maxW?: string;
-  minH?: string;
-}>`
+export const ModalContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   position: relative;
@@ -28,10 +25,4 @@ export const ModalContainer = styled(motion.div)<{
   box-shadow: xs;
   background-color: ${({ theme }) =>
     mode('#fff', theme.colors['dark'][9])(theme.colorMode)};
-  max-width: ${({ maxW }) => maxW || '44rem'};
-  ${({ minH }) =>
-    minH &&
-    css`
-      min-height: ${minH};
-    `};
 `;

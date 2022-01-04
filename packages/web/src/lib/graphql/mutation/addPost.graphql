@@ -1,0 +1,5 @@
+mutation AddPost($file: Upload!, $caption: String) {
+  addPost(file: $file, data: { caption: $caption }) {
+    ...AddPostResponse
+  }
+}

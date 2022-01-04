@@ -4,6 +4,7 @@ export const Wrapper = styled.div`
   font-family: ${th('fontFamily')};
   line-height: 1.4;
   width: 100%;
+  height: 100%;
 `;
 
 export const Required = styled.span`
