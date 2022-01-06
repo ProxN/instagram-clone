@@ -42,7 +42,7 @@ const AddPost: React.FC = () => {
       if (data.addPost.post) {
         reset();
         toast.success('Your post has been shared.');
-        router.push('/home');
+        router.push(`${router.pathname}`);
       }
     },
   });
@@ -60,7 +60,7 @@ const AddPost: React.FC = () => {
         setFilePreview(reader.result as string);
       };
       setFile(e.target.files[0]);
-      router.push('/home?createPost=details', '/create/details');
+      router.push(`${router.pathname}?createPost=details`, '/create/details');
     }
   };
 
@@ -77,7 +77,7 @@ const AddPost: React.FC = () => {
     <Modal
       isOpen={!!router.query.createPost}
       onClose={() => {
-        return router.push('/home');
+        return router.push(`${router.pathname}`);
       }}
       size={filePreview ? 'lg' : 'md'}
     >
@@ -88,7 +88,10 @@ const AddPost: React.FC = () => {
             {router.query.createPost === 'details' && (
               <IconButton
                 onClick={() => {
-                  router.push('/home?createPost=select', '/create/select');
+                  router.push(
+                    `${router.pathname}?createPost=select`,
+                    '/create/select'
+                  );
                 }}
                 variant='ghost'
                 ariaLabel='back'

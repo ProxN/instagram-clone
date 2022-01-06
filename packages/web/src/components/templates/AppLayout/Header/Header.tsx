@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useQueryClient } from 'react-query';
 import { Popover } from 'react-tiny-popover';
@@ -17,6 +18,7 @@ import { client } from '@lib/utility/graphqlClient';
 
 interface HeaderProps {
   avatar?: string | null;
+  username: string;
 }
 
 const links = [
@@ -33,7 +35,8 @@ const links = [
   {
     name: 'create',
     icon: 'plus',
-    href: '/home?createPost=select',
+    href: '',
+    // href: '/home?createPost=select',
     as: '/create/select',
   },
   {
@@ -43,7 +46,20 @@ const links = [
   },
 ];
 
-const Header: React.FC<HeaderProps> = ({ avatar }) => {
+const FadeConfig = {
+  enter: {
+    opacity: 1,
+    translateY: '-3px',
+    transition: { duration: 0.2, ease: [0, 0, 0.2, 1] },
+  },
+  exit: {
+    opacity: 0,
+    translateY: '5px',
+    transition: { duration: 0.1, ease: [0.4, 0, 1, 1] },
+  },
+};
+
+const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const router = useRouter();
@@ -138,7 +154,11 @@ const Header: React.FC<HeaderProps> = ({ avatar }) => {
             >
               {links.map((el) => (
                 <NextLink
-                  href={el.href}
+                  href={
+                    el.name === 'create'
+                      ? `${router.pathname}?createPost=select`
+                      : el.href
+                  }
                   key={el.name}
                   as={el.as ? el.as : el.href}
                 >
@@ -171,6 +191,7 @@ const Header: React.FC<HeaderProps> = ({ avatar }) => {
               </li>
             </Space>
           </Box>
+
           <Box ml={{ md: '1.6rem' }}>
             <Popover
               isOpen={showAvatarMenu}
@@ -181,71 +202,85 @@ const Header: React.FC<HeaderProps> = ({ avatar }) => {
               padding={10}
               containerStyle={{ zIndex: '9999' }}
               content={() => (
-                <Box
-                  backgroundColor='white'
-                  borderRadius='sm'
-                  boxShadow='sm'
-                  minW='20rem'
-                  border='1px solid'
-                  borderColor='blackAlpha.1'
-                >
-                  <Flex flexDirection='column' fontSize='1.6rem'>
-                    <Flex
-                      backgroundColor={{ hover: 'gray.0' }}
-                      cursor='pointer'
-                      alignItems='center'
-                      fontWeight='semibold'
-                      padding='.8rem 1.5rem'
+                <AnimatePresence>
+                  <motion.div
+                    variants={FadeConfig}
+                    initial='exit'
+                    animate='enter'
+                    exit='exit'
+                  >
+                    <Box
+                      backgroundColor='white'
+                      borderRadius='sm'
+                      boxShadow='sm'
+                      minW='20rem'
+                      border='1px solid'
+                      borderColor='blackAlpha.1'
                     >
-                      <Box>
-                        <Icon name='user' />
-                      </Box>
-                      <Text ml='1rem'>Profile</Text>
-                    </Flex>
-                    <Flex
-                      cursor='pointer'
-                      backgroundColor={{ hover: 'gray.0' }}
-                      alignItems='center'
-                      fontWeight='semibold'
-                      padding='.8rem 1.5rem'
-                    >
-                      <Box>
-                        <Icon name='bookmark' />
-                      </Box>
-                      <Text ml='1rem'>Saved</Text>
-                    </Flex>
-                    <NextLink href='/accounts/edit'>
-                      <Flex
-                        cursor='pointer'
-                        backgroundColor={{ hover: 'gray.0' }}
-                        alignItems='center'
-                        fontWeight='semibold'
-                        padding='.8rem 1.5rem'
-                      >
-                        <Box>
-                          <Icon name='settings' />
-                        </Box>
-                        <Text ml='1rem'>Settings</Text>
+                      <Flex flexDirection='column' fontSize='1.6rem'>
+                        <NextLink href={`/home/${username}`}>
+                          <Flex
+                            backgroundColor={{ hover: 'gray.0' }}
+                            cursor='pointer'
+                            alignItems='center'
+                            fontWeight='semibold'
+                            padding='.8rem 1.5rem'
+                          >
+                            <Box>
+                              <Icon name='user' />
+                            </Box>
+                            <Text ml='1rem'>Profile</Text>
+                          </Flex>
+                        </NextLink>
+                        <Flex
+                          cursor='pointer'
+                          backgroundColor={{ hover: 'gray.0' }}
+                          alignItems='center'
+                          fontWeight='semibold'
+                          padding='.8rem 1.5rem'
+                        >
+                          <Box>
+                            <Icon name='bookmark' />
+                          </Box>
+                          <Text ml='1rem'>Saved</Text>
+                        </Flex>
+                        <NextLink href='/accounts/edit'>
+                          <Flex
+                            cursor='pointer'
+                            backgroundColor={{ hover: 'gray.0' }}
+                            alignItems='center'
+                            fontWeight='semibold'
+                            padding='.8rem 1.5rem'
+                          >
+                            <Box>
+                              <Icon name='settings' />
+                            </Box>
+                            <Text ml='1rem'>Settings</Text>
+                          </Flex>
+                        </NextLink>
+                        <Flex
+                          onClick={handleLogout}
+                          cursor='pointer'
+                          alignItems='center'
+                          backgroundColor={{ hover: 'gray.0' }}
+                          fontWeight='semibold'
+                          padding='.8rem .6rem'
+                          borderTop='1px solid transparent'
+                          borderColor='blackAlpha.3'
+                        >
+                          <Text ml='1rem'>Log out</Text>
+                        </Flex>
                       </Flex>
-                    </NextLink>
-                    <Flex
-                      onClick={handleLogout}
-                      cursor='pointer'
-                      alignItems='center'
-                      backgroundColor={{ hover: 'gray.0' }}
-                      fontWeight='semibold'
-                      padding='.8rem .6rem'
-                      borderTop='1px solid transparent'
-                      borderColor='blackAlpha.3'
-                    >
-                      <Text ml='1rem'>Log out</Text>
-                    </Flex>
-                  </Flex>
-                </Box>
+                    </Box>
+                  </motion.div>
+                </AnimatePresence>
               )}
             >
               <div>
-                <Avatar src={avatar} onClick={() => setShowAvatarMenu(true)} />
+                <Avatar
+                  src={avatar}
+                  onClick={() => setShowAvatarMenu(!showAvatarMenu)}
+                />
               </div>
             </Popover>
           </Box>

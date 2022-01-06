@@ -30,9 +30,10 @@ class Post extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   caption?: string;
 
+  @Field(() => User)
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: 'user_id' })
-  user!: string;
+  user!: User;
 
   @Field(() => String)
   @CreateDateColumn()

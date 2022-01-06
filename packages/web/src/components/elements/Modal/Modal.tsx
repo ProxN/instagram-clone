@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Portal } from '../Portal';
 import { Box } from '../../layout/Box';
@@ -26,11 +26,20 @@ export const useModalContext = () => useContext(ModalContext);
 
 export const Modal: React.FC<ModalProps> = (props) => {
   const { children, isOpen, ...rest } = props;
+
+  useEffect(() => {
+    const element = document.querySelector('body');
+    if (!element) return;
+
+    element.style.overflow = 'hidden';
+
+    return () => {
+      element.style.overflow = 'auto';
+    };
+  }, []);
   return (
     <ModalContext.Provider value={{ isOpen, ...rest }}>
-      <AnimatePresence exitBeforeEnter>
-        {isOpen && <Portal>{children}</Portal>}
-      </AnimatePresence>
+      <AnimatePresence>{isOpen && <Portal>{children}</Portal>}</AnimatePresence>
     </ModalContext.Provider>
   );
 };
@@ -62,7 +71,7 @@ const ScaleFade = {
   },
   exit: {
     opacity: 0,
-    scale: 0.9,
+    scale: 0.8,
     transition: { duration: 0.1, ease: [0.4, 0, 1, 1] },
   },
 };

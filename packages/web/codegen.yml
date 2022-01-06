@@ -9,3 +9,5 @@ generates:
       - 'typescript-react-query'
     config:
       fetcher: graphql-request
+      exposeQueryKeys: true
+      exposeFetcher: true

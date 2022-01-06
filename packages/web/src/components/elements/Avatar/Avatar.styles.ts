@@ -6,7 +6,7 @@ import styled, {
 
 export interface AvatarStyleProps extends BackgroundColorProps {
   /**  avatar size */
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
   /** if "true",set avatar border radius to 50% */
   isCircle?: boolean;
@@ -26,6 +26,14 @@ const sizes = {
   lg: {
     height: '5.6rem',
     width: '5.6rem',
+  },
+  xl: {
+    height: '8rem',
+    width: '8rem',
+  },
+  '2xl': {
+    height: '25rem',
+    width: '25rem',
   },
 };
 

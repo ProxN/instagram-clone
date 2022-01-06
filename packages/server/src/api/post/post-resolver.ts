@@ -1,12 +1,12 @@
 import { GraphQLUpload } from 'graphql-upload';
-import { Arg, Authorized, Ctx, Mutation, Resolver } from 'type-graphql';
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import { Upload, uploadFile } from '../../lib/upload';
 import { Context } from '../../types/context';
 import { AddPostInput, AddPostResponse } from '../../types/post';
 import Post from './post-entity';
 import * as PostErrors from './post-error';
 
-@Resolver()
+@Resolver(Post)
 class PostResolver {
   @Authorized()
   @Mutation(() => AddPostResponse)
@@ -38,6 +38,16 @@ class PostResolver {
     }
 
     return { post };
+  }
+
+  @Authorized()
+  @Query(() => [Post], { nullable: true })
+  async getPosts(@Ctx() { req }: Context) {
+    const posts = await Post.find({
+      where: { user_id: req.session.userId },
+      relations: ['user'],
+    });
+    return posts;
   }
 }
 

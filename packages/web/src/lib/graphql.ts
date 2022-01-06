@@ -54,6 +54,12 @@ export type FieldError = {
   message: Scalars['String'];
 };
 
+export type FollowResponse = {
+  __typename?: 'FollowResponse';
+  error?: Maybe<FieldError>;
+  result?: Maybe<Scalars['Boolean']>;
+};
+
 export type ForgotPassResponse = {
   __typename?: 'ForgotPassResponse';
   emailSent?: Maybe<Scalars['Boolean']>;
@@ -68,11 +74,13 @@ export type LoginInputs = {
 export type Mutation = {
   __typename?: 'Mutation';
   addPost: AddPostResponse;
+  follow: FollowResponse;
   forgotPassword: ForgotPassResponse;
   logout: Scalars['Boolean'];
   resetPassword: UserResponse;
   signin: UserResponse;
   signup: UserResponse;
+  unFollow: FollowResponse;
   updateAvatar: UserResponse;
   updatePassword: UpdatePassResponse;
   updateProfile: UserResponse;
@@ -81,6 +89,10 @@ export type Mutation = {
 export type MutationAddPostArgs = {
   data: AddPostInput;
   file: Scalars['Upload'];
+};
+
+export type MutationFollowArgs = {
+  follower_id: Scalars['String'];
 };
 
 export type MutationForgotPasswordArgs = {
@@ -98,6 +110,10 @@ export type MutationSigninArgs = {
 
 export type MutationSignupArgs = {
   data: SignupInputs;
+};
+
+export type MutationUnFollowArgs = {
+  follower_id: Scalars['String'];
 };
 
 export type MutationUpdateAvatarArgs = {
@@ -120,12 +136,19 @@ export type Post = {
   id: Scalars['ID'];
   post_url: Scalars['String'];
   updatedAt: Scalars['String'];
+  user: User;
   user_id: Scalars['String'];
 };
 
 export type Query = {
   __typename?: 'Query';
+  getPosts?: Maybe<Array<Post>>;
+  getUserProfile?: Maybe<User>;
   me?: Maybe<User>;
+};
+
+export type QueryGetUserProfileArgs = {
+  username: Scalars['String'];
 };
 
 export type SignupInputs = {
@@ -133,6 +156,13 @@ export type SignupInputs = {
   name: Scalars['String'];
   password: Scalars['String'];
   username: Scalars['String'];
+};
+
+export type StatsResponse = {
+  __typename?: 'StatsResponse';
+  followers?: Maybe<Scalars['Float']>;
+  following?: Maybe<Scalars['Float']>;
+  posts?: Maybe<Scalars['Float']>;
 };
 
 export type UpdatePassResponse = {
@@ -157,6 +187,7 @@ export type User = {
   has_avatar: Scalars['Boolean'];
   id: Scalars['ID'];
   name: Scalars['String'];
+  stats: StatsResponse;
   updatedAt: Scalars['String'];
   username: Scalars['String'];
   website?: Maybe<Scalars['String']>;
@@ -287,6 +318,32 @@ export type ForgotPasswordMutation = {
       | null
       | undefined;
   };
+};
+
+export type GetUserProfileQueryVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+export type GetUserProfileQuery = {
+  __typename?: 'Query';
+  getUserProfile?:
+    | {
+        __typename?: 'User';
+        id: string;
+        name: string;
+        username: string;
+        bio?: string | null | undefined;
+        website?: string | null | undefined;
+        avatar?: string | null | undefined;
+        stats: {
+          __typename?: 'StatsResponse';
+          followers?: number | null | undefined;
+          following?: number | null | undefined;
+          posts?: number | null | undefined;
+        };
+      }
+    | null
+    | undefined;
 };
 
 export type SigninMutationVariables = Exact<{
@@ -562,6 +619,17 @@ export const useAddPostMutation = <TError = unknown, TContext = unknown>(
       )(),
     options
   );
+useAddPostMutation.fetcher = (
+  client: GraphQLClient,
+  variables: AddPostMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<AddPostMutation, AddPostMutationVariables>(
+    client,
+    AddPostDocument,
+    variables,
+    headers
+  );
 export const ForgotPasswordDocument = `
     mutation ForgotPassword($email: String!) {
   forgotPassword(email: $email) {
@@ -598,6 +666,69 @@ export const useForgotPasswordMutation = <TError = unknown, TContext = unknown>(
       )(),
     options
   );
+useForgotPasswordMutation.fetcher = (
+  client: GraphQLClient,
+  variables: ForgotPasswordMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<ForgotPasswordMutation, ForgotPasswordMutationVariables>(
+    client,
+    ForgotPasswordDocument,
+    variables,
+    headers
+  );
+export const GetUserProfileDocument = `
+    query GetUserProfile($username: String!) {
+  getUserProfile(username: $username) {
+    id
+    name
+    username
+    bio
+    website
+    avatar
+    stats {
+      followers
+      following
+      posts
+    }
+  }
+}
+    `;
+export const useGetUserProfileQuery = <
+  TData = GetUserProfileQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: GetUserProfileQueryVariables,
+  options?: UseQueryOptions<GetUserProfileQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetUserProfileQuery, TError, TData>(
+    ['GetUserProfile', variables],
+    fetcher<GetUserProfileQuery, GetUserProfileQueryVariables>(
+      client,
+      GetUserProfileDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetUserProfileQuery.getKey = (variables: GetUserProfileQueryVariables) => [
+  'GetUserProfile',
+  variables,
+];
+useGetUserProfileQuery.fetcher = (
+  client: GraphQLClient,
+  variables: GetUserProfileQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetUserProfileQuery, GetUserProfileQueryVariables>(
+    client,
+    GetUserProfileDocument,
+    variables,
+    headers
+  );
 export const SigninDocument = `
     mutation Signin($email: String!, $password: String!) {
   signin(data: {email: $email, password: $password}) {
@@ -626,6 +757,17 @@ export const useSigninMutation = <TError = unknown, TContext = unknown>(
       )(),
     options
   );
+useSigninMutation.fetcher = (
+  client: GraphQLClient,
+  variables: SigninMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<SigninMutation, SigninMutationVariables>(
+    client,
+    SigninDocument,
+    variables,
+    headers
+  );
 export const LogoutDocument = `
     mutation Logout {
   logout
@@ -651,6 +793,17 @@ export const useLogoutMutation = <TError = unknown, TContext = unknown>(
         headers
       )(),
     options
+  );
+useLogoutMutation.fetcher = (
+  client: GraphQLClient,
+  variables?: LogoutMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<LogoutMutation, LogoutMutationVariables>(
+    client,
+    LogoutDocument,
+    variables,
+    headers
   );
 export const ResetPasswordDocument = `
     mutation ResetPassword($resetToken: String!, $newPassword: String!) {
@@ -685,6 +838,17 @@ export const useResetPasswordMutation = <TError = unknown, TContext = unknown>(
       )(),
     options
   );
+useResetPasswordMutation.fetcher = (
+  client: GraphQLClient,
+  variables: ResetPasswordMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<ResetPasswordMutation, ResetPasswordMutationVariables>(
+    client,
+    ResetPasswordDocument,
+    variables,
+    headers
+  );
 export const SignupDocument = `
     mutation Signup($email: String!, $password: String!, $name: String!, $username: String!) {
   signup(
@@ -714,6 +878,17 @@ export const useSignupMutation = <TError = unknown, TContext = unknown>(
         headers
       )(),
     options
+  );
+useSignupMutation.fetcher = (
+  client: GraphQLClient,
+  variables: SignupMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<SignupMutation, SignupMutationVariables>(
+    client,
+    SignupDocument,
+    variables,
+    headers
   );
 export const UpdateAvatarDocument = `
     mutation UpdateAvatar($file: Upload!) {
@@ -748,6 +923,17 @@ export const useUpdateAvatarMutation = <TError = unknown, TContext = unknown>(
       )(),
     options
   );
+useUpdateAvatarMutation.fetcher = (
+  client: GraphQLClient,
+  variables: UpdateAvatarMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<UpdateAvatarMutation, UpdateAvatarMutationVariables>(
+    client,
+    UpdateAvatarDocument,
+    variables,
+    headers
+  );
 export const UpdatePasswordDocument = `
     mutation UpdatePassword($oldPassword: String!, $newPassword: String!) {
   updatePassword(oldPassword: $oldPassword, newPassword: $newPassword) {
@@ -780,6 +966,17 @@ export const useUpdatePasswordMutation = <TError = unknown, TContext = unknown>(
         headers
       )(),
     options
+  );
+useUpdatePasswordMutation.fetcher = (
+  client: GraphQLClient,
+  variables: UpdatePasswordMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<UpdatePasswordMutation, UpdatePasswordMutationVariables>(
+    client,
+    UpdatePasswordDocument,
+    variables,
+    headers
   );
 export const UpdateProfileDocument = `
     mutation UpdateProfile($name: String, $username: String, $website: String, $bio: String) {
@@ -816,6 +1013,17 @@ export const useUpdateProfileMutation = <TError = unknown, TContext = unknown>(
       )(),
     options
   );
+useUpdateProfileMutation.fetcher = (
+  client: GraphQLClient,
+  variables?: UpdateProfileMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<UpdateProfileMutation, UpdateProfileMutationVariables>(
+    client,
+    UpdateProfileDocument,
+    variables,
+    headers
+  );
 export const MeDocument = `
     query Me {
   me {
@@ -834,3 +1042,11 @@ export const useMeQuery = <TData = MeQuery, TError = unknown>(
     fetcher<MeQuery, MeQueryVariables>(client, MeDocument, variables, headers),
     options
   );
+
+useMeQuery.getKey = (variables?: MeQueryVariables) =>
+  variables === undefined ? ['Me'] : ['Me', variables];
+useMeQuery.fetcher = (
+  client: GraphQLClient,
+  variables?: MeQueryVariables,
+  headers?: RequestInit['headers']
+) => fetcher<MeQuery, MeQueryVariables>(client, MeDocument, variables, headers);

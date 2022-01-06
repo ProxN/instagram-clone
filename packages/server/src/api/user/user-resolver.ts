@@ -1,15 +1,56 @@
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  FieldResolver,
+  Mutation,
+  Query,
+  Resolver,
+  Root,
+} from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { GraphQLUpload } from 'graphql-upload';
 import { deleteFile, Upload, uploadFile } from '../../lib/upload';
 import { Context } from '../../types/context';
 import * as userErrors from './user-errors';
 import User from './user-entity';
-import { UpdatePassResponse, UpdateUserInput } from '../../types/user';
+import {
+  UpdatePassResponse,
+  UpdateUserInput,
+  StatsResponse,
+} from '../../types/user';
 import { UserResponse } from '../../types/shared';
 
-@Resolver()
+@Resolver(User)
 class UserResolver {
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() { req }: Context) {
+    if (req.session.userId !== user.id) return null;
+    return user.email;
+  }
+
+  @FieldResolver(() => StatsResponse)
+  async stats(@Root() user: User) {
+    const result = await getConnection().query(
+      `
+      select count(f1."follower_id") as followers,
+      (select count(f2."user_id")
+        from follow f2
+        where f2."user_id" = $1
+      ) as following,
+      (select count(id) as posts from post p where p."user_id" = $1)
+      from follow f1
+      where f1."follower_id" = $1
+      `,
+      [user.id]
+    );
+    return {
+      followers: +result[0].followers,
+      following: +result[0].following,
+      posts: +result[0].posts,
+    };
+  }
+
   @Query(() => User, { nullable: true })
   async me(@Ctx() { req }: Context) {
     if (req.session.userId) {
@@ -109,6 +150,13 @@ class UserResolver {
       };
     }
     return { user: updatedUser };
+  }
+
+  @Query(() => User, { nullable: true })
+  async getUserProfile(@Arg('username') username: string) {
+    if (!username) return;
+    const user = await User.findOne({ where: { username } });
+    return user;
   }
 }
 

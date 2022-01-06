@@ -20,7 +20,7 @@ const AddComment = () => {
           ariaLabel='select emoji'
           icon={<Icon name='happy-face' />}
         />
-        <TextArea h='2rem' border='none' w='100%' placeholder='Add a comment' />
+        <TextArea h='3rem' border='none' w='100%' placeholder='Add a comment' />
         <Button variant='link' isPrimary>
           Post
         </Button>

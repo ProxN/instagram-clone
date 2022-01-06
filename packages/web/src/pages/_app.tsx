@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
-import { QueryClientProvider, QueryClient } from 'react-query';
+import { QueryClientProvider, QueryClient, Hydrate } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { Preflight, ThemeProvider } from '@xstyled/styled-components';
 import { Theme } from '@lib/theme';
@@ -37,9 +37,11 @@ const App = (props: AppProps) => {
       <GlobalStyles />
       <QueryClientProvider client={queryClient}>
         {!authLinks.includes(router.pathname) ? (
-          <AppLayout>
-            <Component {...pageProps} />
-          </AppLayout>
+          <Hydrate state={pageProps.dehydratedState}>
+            <AppLayout>
+              <Component {...pageProps} />
+            </AppLayout>
+          </Hydrate>
         ) : (
           <Component {...pageProps} />
         )}
