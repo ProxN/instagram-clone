@@ -143,8 +143,22 @@ export type Post = {
 export type Query = {
   __typename?: 'Query';
   getPosts?: Maybe<Array<Post>>;
+  getUserFollowers?: Maybe<Array<User>>;
+  getUserFollowing?: Maybe<Array<User>>;
   getUserProfile?: Maybe<User>;
   me?: Maybe<User>;
+};
+
+export type QueryGetPostsArgs = {
+  user_id: Scalars['String'];
+};
+
+export type QueryGetUserFollowersArgs = {
+  user_id: Scalars['String'];
+};
+
+export type QueryGetUserFollowingArgs = {
+  user_id: Scalars['String'];
 };
 
 export type QueryGetUserProfileArgs = {
@@ -185,8 +199,10 @@ export type User = {
   createdAt: Scalars['String'];
   email: Scalars['String'];
   has_avatar: Scalars['Boolean'];
+  has_followed?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   name: Scalars['String'];
+  posts: Array<Post>;
   stats: StatsResponse;
   updatedAt: Scalars['String'];
   username: Scalars['String'];
@@ -304,6 +320,22 @@ export type AddPostMutation = {
   };
 };
 
+export type FollowMutationVariables = Exact<{
+  follower_id: Scalars['String'];
+}>;
+
+export type FollowMutation = {
+  __typename?: 'Mutation';
+  follow: {
+    __typename?: 'FollowResponse';
+    result?: boolean | null | undefined;
+    error?:
+      | { __typename?: 'FieldError'; field: string; message: string }
+      | null
+      | undefined;
+  };
+};
+
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
 }>;
@@ -318,32 +350,6 @@ export type ForgotPasswordMutation = {
       | null
       | undefined;
   };
-};
-
-export type GetUserProfileQueryVariables = Exact<{
-  username: Scalars['String'];
-}>;
-
-export type GetUserProfileQuery = {
-  __typename?: 'Query';
-  getUserProfile?:
-    | {
-        __typename?: 'User';
-        id: string;
-        name: string;
-        username: string;
-        bio?: string | null | undefined;
-        website?: string | null | undefined;
-        avatar?: string | null | undefined;
-        stats: {
-          __typename?: 'StatsResponse';
-          followers?: number | null | undefined;
-          following?: number | null | undefined;
-          posts?: number | null | undefined;
-        };
-      }
-    | null
-    | undefined;
 };
 
 export type SigninMutationVariables = Exact<{
@@ -439,6 +445,22 @@ export type SignupMutation = {
   };
 };
 
+export type UnFollowMutationVariables = Exact<{
+  follower_id: Scalars['String'];
+}>;
+
+export type UnFollowMutation = {
+  __typename?: 'Mutation';
+  unFollow: {
+    __typename?: 'FollowResponse';
+    result?: boolean | null | undefined;
+    error?:
+      | { __typename?: 'FieldError'; field: string; message: string }
+      | null
+      | undefined;
+  };
+};
+
 export type UpdateAvatarMutationVariables = Exact<{
   file: Scalars['Upload'];
 }>;
@@ -529,6 +551,71 @@ export type MeQuery = {
         avatar?: string | null | undefined;
         website?: string | null | undefined;
         bio?: string | null | undefined;
+      }
+    | null
+    | undefined;
+};
+
+export type GetUserFollowersQueryVariables = Exact<{
+  user_id: Scalars['String'];
+}>;
+
+export type GetUserFollowersQuery = {
+  __typename?: 'Query';
+  getUserFollowers?:
+    | Array<{
+        __typename?: 'User';
+        id: string;
+        avatar?: string | null | undefined;
+        username: string;
+        name: string;
+        has_followed?: boolean | null | undefined;
+      }>
+    | null
+    | undefined;
+};
+
+export type GetUserFollowingQueryVariables = Exact<{
+  user_id: Scalars['String'];
+}>;
+
+export type GetUserFollowingQuery = {
+  __typename?: 'Query';
+  getUserFollowing?:
+    | Array<{
+        __typename?: 'User';
+        id: string;
+        avatar?: string | null | undefined;
+        username: string;
+        name: string;
+        has_followed?: boolean | null | undefined;
+      }>
+    | null
+    | undefined;
+};
+
+export type GetUserProfileQueryVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+export type GetUserProfileQuery = {
+  __typename?: 'Query';
+  getUserProfile?:
+    | {
+        __typename?: 'User';
+        id: string;
+        name: string;
+        username: string;
+        bio?: string | null | undefined;
+        website?: string | null | undefined;
+        avatar?: string | null | undefined;
+        has_followed?: boolean | null | undefined;
+        stats: {
+          __typename?: 'StatsResponse';
+          followers?: number | null | undefined;
+          following?: number | null | undefined;
+          posts?: number | null | undefined;
+        };
       }
     | null
     | undefined;
@@ -630,6 +717,48 @@ useAddPostMutation.fetcher = (
     variables,
     headers
   );
+export const FollowDocument = `
+    mutation Follow($follower_id: String!) {
+  follow(follower_id: $follower_id) {
+    error {
+      ...Error
+    }
+    result
+  }
+}
+    ${ErrorFragmentDoc}`;
+export const useFollowMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    FollowMutation,
+    TError,
+    FollowMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<FollowMutation, TError, FollowMutationVariables, TContext>(
+    'Follow',
+    (variables?: FollowMutationVariables) =>
+      fetcher<FollowMutation, FollowMutationVariables>(
+        client,
+        FollowDocument,
+        variables,
+        headers
+      )(),
+    options
+  );
+useFollowMutation.fetcher = (
+  client: GraphQLClient,
+  variables: FollowMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<FollowMutation, FollowMutationVariables>(
+    client,
+    FollowDocument,
+    variables,
+    headers
+  );
 export const ForgotPasswordDocument = `
     mutation ForgotPassword($email: String!) {
   forgotPassword(email: $email) {
@@ -674,58 +803,6 @@ useForgotPasswordMutation.fetcher = (
   fetcher<ForgotPasswordMutation, ForgotPasswordMutationVariables>(
     client,
     ForgotPasswordDocument,
-    variables,
-    headers
-  );
-export const GetUserProfileDocument = `
-    query GetUserProfile($username: String!) {
-  getUserProfile(username: $username) {
-    id
-    name
-    username
-    bio
-    website
-    avatar
-    stats {
-      followers
-      following
-      posts
-    }
-  }
-}
-    `;
-export const useGetUserProfileQuery = <
-  TData = GetUserProfileQuery,
-  TError = unknown
->(
-  client: GraphQLClient,
-  variables: GetUserProfileQueryVariables,
-  options?: UseQueryOptions<GetUserProfileQuery, TError, TData>,
-  headers?: RequestInit['headers']
-) =>
-  useQuery<GetUserProfileQuery, TError, TData>(
-    ['GetUserProfile', variables],
-    fetcher<GetUserProfileQuery, GetUserProfileQueryVariables>(
-      client,
-      GetUserProfileDocument,
-      variables,
-      headers
-    ),
-    options
-  );
-
-useGetUserProfileQuery.getKey = (variables: GetUserProfileQueryVariables) => [
-  'GetUserProfile',
-  variables,
-];
-useGetUserProfileQuery.fetcher = (
-  client: GraphQLClient,
-  variables: GetUserProfileQueryVariables,
-  headers?: RequestInit['headers']
-) =>
-  fetcher<GetUserProfileQuery, GetUserProfileQueryVariables>(
-    client,
-    GetUserProfileDocument,
     variables,
     headers
   );
@@ -890,6 +967,48 @@ useSignupMutation.fetcher = (
     variables,
     headers
   );
+export const UnFollowDocument = `
+    mutation UnFollow($follower_id: String!) {
+  unFollow(follower_id: $follower_id) {
+    error {
+      ...Error
+    }
+    result
+  }
+}
+    ${ErrorFragmentDoc}`;
+export const useUnFollowMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    UnFollowMutation,
+    TError,
+    UnFollowMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<UnFollowMutation, TError, UnFollowMutationVariables, TContext>(
+    'UnFollow',
+    (variables?: UnFollowMutationVariables) =>
+      fetcher<UnFollowMutation, UnFollowMutationVariables>(
+        client,
+        UnFollowDocument,
+        variables,
+        headers
+      )(),
+    options
+  );
+useUnFollowMutation.fetcher = (
+  client: GraphQLClient,
+  variables: UnFollowMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<UnFollowMutation, UnFollowMutationVariables>(
+    client,
+    UnFollowDocument,
+    variables,
+    headers
+  );
 export const UpdateAvatarDocument = `
     mutation UpdateAvatar($file: Upload!) {
   updateAvatar(file: $file) {
@@ -1050,3 +1169,146 @@ useMeQuery.fetcher = (
   variables?: MeQueryVariables,
   headers?: RequestInit['headers']
 ) => fetcher<MeQuery, MeQueryVariables>(client, MeDocument, variables, headers);
+export const GetUserFollowersDocument = `
+    query GetUserFollowers($user_id: String!) {
+  getUserFollowers(user_id: $user_id) {
+    id
+    avatar
+    username
+    name
+    has_followed
+  }
+}
+    `;
+export const useGetUserFollowersQuery = <
+  TData = GetUserFollowersQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: GetUserFollowersQueryVariables,
+  options?: UseQueryOptions<GetUserFollowersQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetUserFollowersQuery, TError, TData>(
+    ['GetUserFollowers', variables],
+    fetcher<GetUserFollowersQuery, GetUserFollowersQueryVariables>(
+      client,
+      GetUserFollowersDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetUserFollowersQuery.getKey = (
+  variables: GetUserFollowersQueryVariables
+) => ['GetUserFollowers', variables];
+useGetUserFollowersQuery.fetcher = (
+  client: GraphQLClient,
+  variables: GetUserFollowersQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetUserFollowersQuery, GetUserFollowersQueryVariables>(
+    client,
+    GetUserFollowersDocument,
+    variables,
+    headers
+  );
+export const GetUserFollowingDocument = `
+    query GetUserFollowing($user_id: String!) {
+  getUserFollowing(user_id: $user_id) {
+    id
+    avatar
+    username
+    name
+    has_followed
+  }
+}
+    `;
+export const useGetUserFollowingQuery = <
+  TData = GetUserFollowingQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: GetUserFollowingQueryVariables,
+  options?: UseQueryOptions<GetUserFollowingQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetUserFollowingQuery, TError, TData>(
+    ['GetUserFollowing', variables],
+    fetcher<GetUserFollowingQuery, GetUserFollowingQueryVariables>(
+      client,
+      GetUserFollowingDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetUserFollowingQuery.getKey = (
+  variables: GetUserFollowingQueryVariables
+) => ['GetUserFollowing', variables];
+useGetUserFollowingQuery.fetcher = (
+  client: GraphQLClient,
+  variables: GetUserFollowingQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetUserFollowingQuery, GetUserFollowingQueryVariables>(
+    client,
+    GetUserFollowingDocument,
+    variables,
+    headers
+  );
+export const GetUserProfileDocument = `
+    query GetUserProfile($username: String!) {
+  getUserProfile(username: $username) {
+    id
+    name
+    username
+    bio
+    website
+    avatar
+    has_followed
+    stats {
+      followers
+      following
+      posts
+    }
+  }
+}
+    `;
+export const useGetUserProfileQuery = <
+  TData = GetUserProfileQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: GetUserProfileQueryVariables,
+  options?: UseQueryOptions<GetUserProfileQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetUserProfileQuery, TError, TData>(
+    ['GetUserProfile', variables],
+    fetcher<GetUserProfileQuery, GetUserProfileQueryVariables>(
+      client,
+      GetUserProfileDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetUserProfileQuery.getKey = (variables: GetUserProfileQueryVariables) => [
+  'GetUserProfile',
+  variables,
+];
+useGetUserProfileQuery.fetcher = (
+  client: GraphQLClient,
+  variables: GetUserProfileQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetUserProfileQuery, GetUserProfileQueryVariables>(
+    client,
+    GetUserProfileDocument,
+    variables,
+    headers
+  );

@@ -1,10 +1,13 @@
 import { NextPageContext } from 'next';
 
 export async function getServerSideProps(context: NextPageContext) {
-  if (context.query.create === 'select' || context.query.create === 'details') {
+  if (
+    context.query.followers === 'followers' ||
+    context.query.following === 'following'
+  ) {
     return {
       redirect: {
-        destination: '/home',
+        destination: `/home/${context.query.profile}`,
         permanent: false,
       },
     };
@@ -13,9 +16,7 @@ export async function getServerSideProps(context: NextPageContext) {
     props: {}, // will be passed to the page component as props
   };
 }
-
-const Create = () => {
+const Followers = () => {
   return null;
 };
-
-export default Create;
+export default Followers;

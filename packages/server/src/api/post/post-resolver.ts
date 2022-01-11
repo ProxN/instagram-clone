@@ -1,5 +1,6 @@
 import { GraphQLUpload } from 'graphql-upload';
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { getConnection } from 'typeorm';
 import { Upload, uploadFile } from '../../lib/upload';
 import { Context } from '../../types/context';
 import { AddPostInput, AddPostResponse } from '../../types/post';
@@ -42,12 +43,15 @@ class PostResolver {
 
   @Authorized()
   @Query(() => [Post], { nullable: true })
-  async getPosts(@Ctx() { req }: Context) {
-    const posts = await Post.find({
-      where: { user_id: req.session.userId },
-      relations: ['user'],
-    });
-    return posts;
+  async getPosts(@Arg('user_id') user_id: string, @Ctx() { req }: Context) {
+    const result = await getConnection().query(
+      `
+      select * from post p
+      where p."user_id" = $1
+    `,
+      [user_id]
+    );
+    return result;
   }
 }
 

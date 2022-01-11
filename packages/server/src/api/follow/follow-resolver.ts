@@ -1,6 +1,8 @@
-import { Arg, Authorized, Ctx, Mutation, Resolver } from 'type-graphql';
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { getConnection } from 'typeorm';
 import { Context } from '../../types/context';
 import { FollowResponse } from '../../types/follow';
+import User from '../user/user-entity';
 import Follow from './follow-entity';
 import * as followErrors from './follow-errors';
 
@@ -57,6 +59,37 @@ class FollowResolver {
     });
 
     return { result: res.affected === 1 };
+  }
+
+  @Authorized()
+  @Query(() => [User], { nullable: true })
+  async getUserFollowers(@Arg('user_id') user_id: string) {
+    const followers = await getConnection().query(
+      `
+      select u.*
+      from follow f
+      inner join public.user u on u."id" = f."user_id"
+      where f."follower_id" = $1
+      `,
+      [user_id]
+    );
+
+    return followers;
+  }
+
+  @Authorized()
+  @Query(() => [User], { nullable: true })
+  async getUserFollowing(@Arg('user_id') user_id: string) {
+    const following = await getConnection().query(
+      `
+      select u.* 
+      from follow f
+      inner join public.user u on u."id" = f."follower_id"
+      where f."user_id" = $1
+      `,
+      [user_id]
+    );
+    return following;
   }
 }
 

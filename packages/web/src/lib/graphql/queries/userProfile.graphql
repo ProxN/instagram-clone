@@ -6,6 +6,7 @@ query GetUserProfile($username: String!) {
     bio
     website
     avatar
+    has_followed
     stats {
       followers
       following

@@ -99,7 +99,7 @@ const Edit = () => {
             <Avatar
               isLoading={isLoading}
               size='md'
-              src={avatar || userData.me?.avatar}
+              src={avatar || '/default.jpg' || userData.me?.avatar}
             />
             <Box display='none'>
               <Input

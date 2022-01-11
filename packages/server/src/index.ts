@@ -27,6 +27,7 @@ import {
   SESSION_SECRET,
   SENTRY_DSN,
 } from './lib/config';
+import { createHasFollowedLoader } from './lib/loaders/createHasFollowedLoader';
 
 logger.info('Starting Application');
 
@@ -84,6 +85,7 @@ const Main = async () => {
       req,
       res,
       redis,
+      followLoader: createHasFollowedLoader(),
     }),
     validationRules: [depthLimit(6)],
   });

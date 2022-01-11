@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Portal } from '../Portal';
-import { Box } from '../../layout/Box';
+import { Box, BoxProps } from '../../layout/Box';
 import { IconButton } from '../IconButton';
 import { Icon } from '../Icon';
 import { Overylay, ModalContainer } from './Modal.styles';
@@ -141,12 +141,13 @@ export const CloseModalButton = () => {
   );
 };
 
-export const ModalBody: React.FC<{ padding?: string }> = ({
+export const ModalBody: React.FC<BoxProps> = ({
   children,
   padding,
+  ...rest
 }) => {
   return (
-    <Box flex='1' padding={padding || '1rem 1.4rem'}>
+    <Box flex='1' padding={padding || '1rem 1.4rem'} {...rest}>
       {children}
     </Box>
   );

@@ -1,0 +1,8 @@
+mutation Follow($follower_id: String!) {
+  follow(follower_id: $follower_id) {
+    error {
+      ...Error
+    }
+    result
+  }
+}

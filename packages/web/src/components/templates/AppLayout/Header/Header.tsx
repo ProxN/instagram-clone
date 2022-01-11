@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
-import { useQueryClient } from 'react-query';
 import { Popover } from 'react-tiny-popover';
 import { Icon } from '@components/elements/Icon';
 import { Box } from '@components/layout/Box';
@@ -13,38 +11,12 @@ import { Space } from '@components/layout/Space';
 import { IconButton } from '@components/elements/IconButton';
 import { Avatar } from '@components/elements/Avatar';
 import { Text } from '@components/elements/Text';
-import { useLogoutMutation } from '@lib/graphql';
-import { client } from '@lib/utility/graphqlClient';
+import { useLogout } from '@lib/hooks/useLogout';
 
 interface HeaderProps {
   avatar?: string | null;
   username: string;
 }
-
-const links = [
-  {
-    name: 'home',
-    icon: 'home',
-    href: '/home',
-  },
-  {
-    name: 'inbox',
-    icon: 'paper-plane',
-    href: '/inbox',
-  },
-  {
-    name: 'create',
-    icon: 'plus',
-    href: '',
-    // href: '/home?createPost=select',
-    as: '/create/select',
-  },
-  {
-    name: 'explore',
-    icon: 'compass',
-    href: '/explore',
-  },
-];
 
 const FadeConfig = {
   enter: {
@@ -63,17 +35,7 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const router = useRouter();
-  const queryClient = useQueryClient();
-
-  const { mutate } = useLogoutMutation(client, {
-    onSuccess: (data) => {
-      if (data.logout) {
-        queryClient.invalidateQueries('Me');
-        toast.success('Successfully logged out!');
-        router.push('/');
-      }
-    },
-  });
+  const { handleLogout } = useLogout();
 
   useEffect(() => {
     const handleRouteChange = () => {
@@ -87,10 +49,6 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
       router.events.off('routeChangeStart', handleRouteChange);
     };
   }, [router]);
-
-  const handleLogout = () => {
-    mutate({});
-  };
 
   return (
     <>
@@ -146,40 +104,63 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
                 defaultValue=''
               />
             </Box>
+            {/* Links */}
             <Space
               justifyContent={{ xs: 'space-between', md: 'flex-end' }}
               alignItems='center'
               as='ul'
               size='md'
             >
-              {links.map((el) => (
-                <NextLink
-                  href={
-                    el.name === 'create'
-                      ? `${router.pathname}?createPost=select`
-                      : el.href
-                  }
-                  key={el.name}
-                  as={el.as ? el.as : el.href}
-                >
-                  <li>
-                    <IconButton
-                      ariaLabel={el.name}
-                      color='blackAlpha'
-                      variant='link'
-                      icon={
-                        <Icon
-                          name={
-                            el.href === router.pathname
-                              ? `${el.icon}-sharp`
-                              : el.icon
-                          }
-                        />
-                      }
-                    />
-                  </li>
-                </NextLink>
-              ))}
+              <NextLink href='/home'>
+                <li>
+                  <IconButton
+                    size='sm'
+                    ariaLabel='home link'
+                    color='blackAlpha'
+                    variant='link'
+                    icon={<Icon name='home' />}
+                  />
+                </li>
+              </NextLink>
+              <NextLink href='/inbox'>
+                <li>
+                  <IconButton
+                    size='sm'
+                    ariaLabel='home link'
+                    color='blackAlpha'
+                    variant='link'
+                    icon={<Icon name='paper-plane' />}
+                  />
+                </li>
+              </NextLink>
+              <NextLink
+                href={{
+                  pathname: router.pathname,
+                  query: { ...router.query, createPost: 'select' },
+                }}
+                as='/create/select'
+              >
+                <li>
+                  <IconButton
+                    size='sm'
+                    ariaLabel='home link'
+                    color='blackAlpha'
+                    variant='link'
+                    icon={<Icon name='plus' />}
+                  />
+                </li>
+              </NextLink>
+              <NextLink href='/explore'>
+                <li>
+                  <IconButton
+                    size='sm'
+                    ariaLabel='home link'
+                    color='blackAlpha'
+                    variant='link'
+                    icon={<Icon name='compass' />}
+                  />
+                </li>
+              </NextLink>
               <li>
                 <IconButton
                   size='sm'

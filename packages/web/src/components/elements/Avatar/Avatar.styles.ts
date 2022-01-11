@@ -32,8 +32,8 @@ const sizes = {
     width: '8rem',
   },
   '2xl': {
-    height: '25rem',
-    width: '25rem',
+    height: '10rem',
+    width: '10rem',
   },
 };
 
@@ -50,6 +50,7 @@ export const AvatarContaienr = styled.div<AvatarStyleProps>`
   font-size: 1.4rem;
   font-weight: 500;
   cursor: pointer;
+  position:relative;
 
   img {
     height: 100%;

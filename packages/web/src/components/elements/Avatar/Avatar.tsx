@@ -55,13 +55,7 @@ const Avatar: React.FC<AvatarProps> = ({
       ) : (
         src && (
           <>
-            <Image
-              height='100%'
-              width='100%'
-              src={src}
-              alt={alt}
-              {...imgProps}
-            />
+            <Image layout='fill' src={src} alt={alt} {...imgProps} />
           </>
         )
       )}

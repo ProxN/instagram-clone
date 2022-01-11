@@ -18,6 +18,10 @@ import styled, {
   th,
   display,
   DisplayProps,
+  textDecoration,
+  TextDecorationProps,
+  cursor,
+  CursorProps,
 } from '@xstyled/styled-components';
 import { mode } from '@lib/utility/component';
 
@@ -29,7 +33,9 @@ const TextSystem = compose(
   lineHeight,
   space,
   opacity,
-  display
+  display,
+  textDecoration,
+  cursor
 );
 
 export interface TextBaseProps
@@ -40,7 +46,9 @@ export interface TextBaseProps
     LineHeightProps,
     SpaceProps,
     OpacityProps,
-    DisplayProps {
+    DisplayProps,
+    CursorProps,
+    TextDecorationProps {
   /** color from theme.colors */
   color?: string;
 

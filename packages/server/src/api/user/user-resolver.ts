@@ -20,6 +20,7 @@ import {
   StatsResponse,
 } from '../../types/user';
 import { UserResponse } from '../../types/shared';
+import Post from '../post/post-entity';
 
 @Resolver(User)
 class UserResolver {
@@ -27,6 +28,12 @@ class UserResolver {
   email(@Root() user: User, @Ctx() { req }: Context) {
     if (req.session.userId !== user.id) return null;
     return user.email;
+  }
+
+  @FieldResolver(() => [Post])
+  async posts(@Root() user: User) {
+    const posts = await Post.find({ where: { user_id: user.id } });
+    return posts;
   }
 
   @FieldResolver(() => StatsResponse)
@@ -49,6 +56,20 @@ class UserResolver {
       following: +result[0].following,
       posts: +result[0].posts,
     };
+  }
+
+  @FieldResolver(() => Boolean, { nullable: true })
+  async has_followed(
+    @Root() user: User,
+    @Ctx() { req, followLoader }: Context
+  ) {
+    if (!req.session.userId) return null;
+    const result = await followLoader.load({
+      user_id: req.session.userId as string,
+      follower_id: user.id,
+    });
+
+    return !!result;
   }
 
   @Query(() => User, { nullable: true })
