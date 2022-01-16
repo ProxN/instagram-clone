@@ -42,7 +42,7 @@ const AddPost: React.FC = () => {
       if (data.addPost.post) {
         reset();
         toast.success('Your post has been shared.');
-        router.push(`${router.pathname}`);
+        handleFormClose();
       }
     },
   });
@@ -60,7 +60,13 @@ const AddPost: React.FC = () => {
         setFilePreview(reader.result as string);
       };
       setFile(e.target.files[0]);
-      router.push(`${router.pathname}?createPost=details`, '/create/details');
+      router.push(
+        {
+          pathname: router.pathname,
+          query: { ...router.query, createPost: 'details' },
+        },
+        '/create/details'
+      );
     }
   };
 
@@ -92,7 +98,10 @@ const AddPost: React.FC = () => {
               <IconButton
                 onClick={() => {
                   router.push(
-                    `${router.pathname}?createPost=select`,
+                    {
+                      pathname: router.pathname,
+                      query: { ...router.query, createPost: 'select' },
+                    },
                     '/create/select'
                   );
                 }}

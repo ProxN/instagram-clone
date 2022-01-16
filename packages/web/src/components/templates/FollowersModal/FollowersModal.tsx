@@ -55,6 +55,7 @@ const FollowersModal: React.FC<{ user_id: string; currentUser: boolean }> = ({
                   buttonProps={{
                     variant: 'outline',
                   }}
+                  id={el.id}
                   buttonText='remove'
                   name={el.name}
                   avatar={el.avatar}

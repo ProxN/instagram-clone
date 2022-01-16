@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useRouter } from 'next/router';
 import { NextPageContext } from 'next';
 import NextLink from 'next/link';
 import { QueryClient, dehydrate, useQueryClient } from 'react-query';
@@ -15,7 +15,6 @@ import {
   useFollowMutation,
   useGetUserProfileQuery,
   useMeQuery,
-  useUnFollowMutation,
 } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { Loader } from '@components/elements/Loader';
@@ -23,12 +22,13 @@ import { SettingsModal } from '@components/templates/SettingsModal';
 import { useDisclosure } from '@lib/hooks/useDisclosure';
 import { UserPosts } from '@components/templates/UserPosts';
 import { FollowersModal } from '@components/templates/FollowersModal';
-import { useRouter } from 'next/router';
 import FollowingModal from '@components/templates/FollowingModal/FollowingModal';
+import { UnFollowModal } from '@components/templates/UnFollowModal';
 
 const Profile = ({ username }: { username: string }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { onOpen, onClose, isOpen } = useDisclosure();
   const {
     isOpen: settingsOpen,
     onClose: onCloseSettings,
@@ -37,6 +37,7 @@ const Profile = ({ username }: { username: string }) => {
   const { data, isLoading } = useGetUserProfileQuery(client, {
     username,
   });
+
   const { mutate: followMutation, isLoading: followIsLoading } =
     useFollowMutation(client, {
       onSuccess: (data) => {
@@ -47,22 +48,6 @@ const Profile = ({ username }: { username: string }) => {
               return {
                 ...old,
                 getUserProfile: { ...old?.getUserProfile, has_followed: true },
-              };
-            }
-          );
-        }
-      },
-    });
-  const { mutate: unFollowMutation, isLoading: unFollowIsLoading } =
-    useUnFollowMutation(client, {
-      onSuccess: (data) => {
-        if (data.unFollow.result) {
-          queryClient.setQueryData<GetUserProfileQuery>(
-            useGetUserProfileQuery.getKey({ username }),
-            (old: any) => {
-              return {
-                ...old,
-                getUserProfile: { ...old?.getUserProfile, has_followed: false },
               };
             }
           );
@@ -81,15 +66,10 @@ const Profile = ({ username }: { username: string }) => {
 
   if (!data || !data.getUserProfile) return null;
 
-  const followHandler = useCallback(() => {
+  const followHandler = () => {
     if (!data.getUserProfile?.id) return;
     followMutation({ follower_id: data.getUserProfile.id });
-  }, [data.getUserProfile.id, followMutation]);
-
-  const unFollowHandler = useCallback(() => {
-    if (!data.getUserProfile?.id) return;
-    unFollowMutation({ follower_id: data.getUserProfile.id });
-  }, [data.getUserProfile.id, unFollowMutation]);
+  };
 
   return (
     <>
@@ -138,13 +118,7 @@ const Profile = ({ username }: { username: string }) => {
                       <Button mr={2} size='sm' variant='outline'>
                         Message
                       </Button>
-                      <Button
-                        onClick={unFollowHandler}
-                        size='sm'
-                        variant='outline'
-                        isLoading={unFollowIsLoading}
-                        isDisabled={unFollowIsLoading}
-                      >
+                      <Button onClick={onOpen} size='sm' variant='outline'>
                         Unfollow
                       </Button>
                     </>
@@ -269,27 +243,53 @@ const Profile = ({ username }: { username: string }) => {
           >
             <li style={{ flex: '1' }}>
               <Flex flex='1' flexDirection='column' alignItems='center'>
-                <Text fontWeight='semibold'>10</Text>
+                <Text fontWeight='semibold'>
+                  {data.getUserProfile.stats.posts}
+                </Text>
                 <Text color='gray'>posts</Text>
               </Flex>
             </li>
-            <li style={{ flex: '1' }}>
-              <Flex
-                flex='1'
-                cursor='pointer'
-                flexDirection='column'
-                alignItems='center'
-              >
-                <Text fontWeight='semibold'>10</Text>
-                <Text color='gray'>follower</Text>
-              </Flex>
-            </li>
-            <li style={{ flex: '1' }}>
-              <Flex cursor='pointer' flexDirection='column' alignItems='center'>
-                <Text fontWeight='semibold'>10</Text>
-                <Text color='gray'>following</Text>
-              </Flex>
-            </li>
+            <NextLink
+              href={{
+                pathname: router.pathname,
+                query: { ...router.query, followers: 'list' },
+              }}
+              as={`${router.asPath}/followers`}
+            >
+              <li style={{ flex: '1' }}>
+                <Flex
+                  flex='1'
+                  cursor='pointer'
+                  flexDirection='column'
+                  alignItems='center'
+                >
+                  <Text fontWeight='semibold'>
+                    {data.getUserProfile.stats.followers}
+                  </Text>
+                  <Text color='gray'>followers</Text>
+                </Flex>
+              </li>
+            </NextLink>
+            <NextLink
+              href={{
+                pathname: router.pathname,
+                query: { ...router.query, following: 'list' },
+              }}
+              as={`${router.asPath}/following`}
+            >
+              <li style={{ flex: '1' }}>
+                <Flex
+                  cursor='pointer'
+                  flexDirection='column'
+                  alignItems='center'
+                >
+                  <Text fontWeight='semibold'>
+                    {data.getUserProfile.stats.following}
+                  </Text>
+                  <Text color='gray'>following</Text>
+                </Flex>
+              </li>
+            </NextLink>
           </Flex>
           {/* Tabs */}
           <Flex
@@ -306,13 +306,20 @@ const Profile = ({ username }: { username: string }) => {
               cursor='pointer'
               alignItems='center'
               mr={{ md: '4rem' }}
-              borderTop='2px solid '
-              borderColor='blackAlpha.7'
+              borderTop={{ xs: 'none', md: '2px solid transparent' }}
+              borderColor={{ md: 'blackAlpha.7' }}
             >
-              <Box fontSize='1.2rem' mr={{ md: '.6rem' }}>
+              <Box
+                fontSize={{ xs: '2.4rem', md: '1.2rem' }}
+                mr={{ md: '.6rem' }}
+              >
                 <Icon name='film' />
               </Box>
-              <Text fontWeight='semibold' textTransform='uppercase'>
+              <Text
+                display={{ xs: 'none', md: 'inline' }}
+                fontWeight='semibold'
+                textTransform='uppercase'
+              >
                 Posts
               </Text>
             </Flex>
@@ -324,10 +331,17 @@ const Profile = ({ username }: { username: string }) => {
               mr={{ md: '4rem' }}
               color='gray.6'
             >
-              <Box fontSize='1.2rem' mr={{ md: '.6rem' }}>
+              <Box
+                fontSize={{ xs: '2.4rem', md: '1.2rem' }}
+                mr={{ md: '.6rem' }}
+              >
                 <Icon name='bookmark' />
               </Box>
-              <Text fontWeight='semibold' textTransform='uppercase'>
+              <Text
+                display={{ xs: 'none', md: 'inline' }}
+                fontWeight='semibold'
+                textTransform='uppercase'
+              >
                 Bookmark
               </Text>
             </Flex>
@@ -338,20 +352,34 @@ const Profile = ({ username }: { username: string }) => {
               cursor='pointer'
               color='gray.6'
             >
-              <Box fontSize='1.2rem' mr={{ md: '.6rem' }}>
+              <Box
+                fontSize={{ xs: '2.4rem', md: '1.2rem' }}
+                mr={{ md: '.6rem' }}
+              >
                 <Icon name='people' />
               </Box>
-              <Text fontWeight='semibold' textTransform='uppercase'>
+              <Text
+                display={{ xs: 'none', md: 'inline' }}
+                fontWeight='semibold'
+                textTransform='uppercase'
+              >
                 Tagged
               </Text>
             </Flex>
           </Flex>
           {/* Profile Posts */}
-          <UserPosts />
+          <UserPosts user_id={data.getUserProfile.id} />
         </Box>
       </Box>
       {/* Modal */}
       <SettingsModal isOpen={settingsOpen} onClose={onCloseSettings} />
+      <UnFollowModal
+        id={data.getUserProfile.id}
+        username={username}
+        isOpen={isOpen}
+        onClose={onClose}
+        avatar={data.getUserProfile.avatar}
+      />
       {!!router.query.followers && (
         <FollowersModal
           currentUser={currentUser?.me?.id === data.getUserProfile.id}
@@ -379,6 +407,19 @@ export async function getServerSideProps(context: NextPageContext) {
     useGetUserProfileQuery.getKey({ username }),
     useGetUserProfileQuery.fetcher(client, { username }, headers)
   );
+
+  // const userProfile = queryClient.getQueryData<GetUserProfileQuery>(
+  //   useGetUserProfileQuery.getKey({ username })
+  // );
+
+  // if (userProfile && userProfile.getUserProfile) {
+  //   const user_id = userProfile.getUserProfile.id;
+  //   await queryClient.prefetchInfiniteQuery(
+  //     'cursor',
+  //     useGetUserPostsQuery.getKey({ user_id, limit: 30, cursor: null }),
+  //     useGetUserPostsQuery.fetcher(client, { user_id, limit: 30 })
+  //   );
+  // }
 
   return {
     props: {

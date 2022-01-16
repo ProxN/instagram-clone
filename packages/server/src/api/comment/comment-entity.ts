@@ -1,44 +1,44 @@
-import { Field, ID, ObjectType } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
-  UpdateDateColumn,
-  PrimaryGeneratedColumn,
-  ManyToOne,
   JoinColumn,
-  OneToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import Comment from '../comment/comment-entity';
+import Post from '../post/post-entity';
 import User from '../user/user-entity';
 
 @ObjectType()
 @Entity()
-class Post extends BaseEntity {
-  @Field(() => ID)
+class Comment extends BaseEntity {
+  @Field()
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Field()
   @Column()
-  post_url!: string;
+  text!: string;
 
   @Field()
   @Column()
   user_id!: string;
 
-  @Field(() => String, { nullable: true })
-  @Column({ type: 'text', nullable: true })
-  caption?: string;
+  @Field()
+  @Column()
+  post_id!: string;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user) => user.posts)
+  @ManyToOne(() => User, (user) => user.comments)
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
-  @OneToMany(() => Comment, (comment) => comment.post)
-  comments!: Comment[];
+  @ManyToOne(() => Post, (post) => post.comments)
+  @JoinColumn({ name: 'post_id' })
+  post!: Post;
 
   @Field(() => String)
   @CreateDateColumn({ type: 'timestamptz' })
@@ -49,4 +49,4 @@ class Post extends BaseEntity {
   updatedAt?: Date;
 }
 
-export default Post;
+export default Comment;

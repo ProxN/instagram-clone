@@ -3,7 +3,7 @@ import { NextPageContext } from 'next';
 export async function getServerSideProps(context: NextPageContext) {
   if (
     context.query.followers === 'followers' ||
-    context.query.following === 'following'
+    context.query.followers === 'following'
   ) {
     return {
       redirect: {

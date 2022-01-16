@@ -1,0 +1,11 @@
+query GetUserPosts($user_id: String!, $limit: Int!, $cursor: String) {
+  getPosts(user_id: $user_id, limit: $limit, cursor: $cursor) {
+    posts {
+      id
+      post_url
+      caption
+      createdAt
+    }
+    hasMore
+  }
+}

@@ -28,6 +28,7 @@ import {
   SENTRY_DSN,
 } from './lib/config';
 import { createHasFollowedLoader } from './lib/loaders/createHasFollowedLoader';
+import { createUserLoader } from './lib/loaders/createUserLoader';
 
 logger.info('Starting Application');
 
@@ -86,6 +87,7 @@ const Main = async () => {
       res,
       redis,
       followLoader: createHasFollowedLoader(),
+      userLoader: createUserLoader(),
     }),
     validationRules: [depthLimit(6)],
   });

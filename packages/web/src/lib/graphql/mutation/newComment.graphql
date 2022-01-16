@@ -1,0 +1,16 @@
+mutation NewComment($post_id: String!, $text: String!) {
+  newComment(comment_body: { post_id: $post_id, text: $text }) {
+    error {
+      ...Error
+    }
+    comment {
+      id
+      text
+      createdAt
+      user {
+        username
+        avatar
+      }
+    }
+  }
+}

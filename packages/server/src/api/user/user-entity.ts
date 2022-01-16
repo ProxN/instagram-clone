@@ -14,6 +14,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import Post from '../post/post-entity';
 import Follow from '../follow/follow-entity';
+import Comment from '../comment/comment-entity';
 
 @ObjectType()
 @Entity()
@@ -61,6 +62,9 @@ class User extends BaseEntity {
 
   @OneToMany(() => Follow, (following) => following.follower)
   following!: Follow[];
+
+  @OneToMany(() => Comment, (comment) => comment.user_id)
+  comments!: Comment[];
 
   @Field(() => String)
   @CreateDateColumn()

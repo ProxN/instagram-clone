@@ -11,6 +11,7 @@ const sizes = {
   sm: '38rem',
   md: '44rem',
   lg: '52rem',
+  xl: '94rem',
   full: '100%',
 };
 interface ModalProps {
@@ -29,14 +30,14 @@ export const Modal: React.FC<ModalProps> = (props) => {
 
   useEffect(() => {
     const element = document.querySelector('body');
-    if (!element) return;
+    if (!element || !isOpen) return;
 
     element.style.overflow = 'hidden';
 
     return () => {
       element.style.overflow = 'auto';
     };
-  }, []);
+  }, [isOpen]);
   return (
     <ModalContext.Provider value={{ isOpen, ...rest }}>
       <AnimatePresence>{isOpen && <Portal>{children}</Portal>}</AnimatePresence>
@@ -97,6 +98,7 @@ export const ModalContent: React.FC = ({ children }) => {
       h='100vh'
       w='100%'
       position='fixed'
+      p='0 2.5rem'
       top='0'
       left='0'
       zIndex={999}
@@ -125,14 +127,22 @@ export const ModalHeading: React.FC = ({ children }) => {
   );
 };
 
-export const CloseModalButton = () => {
+export const CloseModalButton: React.FC<{ isFixed?: boolean }> = ({
+  isFixed = false,
+}) => {
   const { onClose } = useModalContext();
 
   return (
-    <Box position='absolute' top='.2rem' right='1rem'>
+    <Box
+      position={isFixed ? 'fixed' : 'absolute'}
+      top='.2rem'
+      right='1rem'
+      color={isFixed ? '#fff' : 'inerit'}
+    >
       <IconButton
         onClick={onClose}
-        variant='ghost'
+        variant={isFixed ? 'link' : 'ghost'}
+        color={isFixed ? 'inherit' : ''}
         size='lg'
         ariaLabel='Close Modal'
         icon={<Icon name='close' />}

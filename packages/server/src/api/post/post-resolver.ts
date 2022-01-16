@@ -1,14 +1,30 @@
 import { GraphQLUpload } from 'graphql-upload';
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  FieldResolver,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+  Root,
+} from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { Upload, uploadFile } from '../../lib/upload';
 import { Context } from '../../types/context';
-import { AddPostInput, AddPostResponse } from '../../types/post';
+import { AddPostInput, AddPostResponse, PostsResponse } from '../../types/post';
+import User from '../user/user-entity';
 import Post from './post-entity';
 import * as PostErrors from './post-error';
 
 @Resolver(Post)
 class PostResolver {
+  @FieldResolver(() => User)
+  async user(@Root() post: Post) {
+    return User.findOne(post.user_id);
+  }
+
   @Authorized()
   @Mutation(() => AddPostResponse)
   async addPost(
@@ -41,17 +57,44 @@ class PostResolver {
     return { post };
   }
 
-  @Authorized()
-  @Query(() => [Post], { nullable: true })
-  async getPosts(@Arg('user_id') user_id: string, @Ctx() { req }: Context) {
+  @Query(() => PostsResponse)
+  async getPosts(
+    @Arg('user_id') user_id: string,
+    @Arg('cursor', () => String, { nullable: true }) cursor: string | null,
+    @Arg('limit', () => Int) limit: number
+  ): Promise<PostsResponse> {
+    if (!user_id) return { posts: [], hasMore: false };
+
+    const postsLimit = Math.min(30, limit);
+    const realLimit = postsLimit + 1;
+    const args: any[] = [user_id, realLimit];
+
+    if (cursor) {
+      args.push(new Date(+cursor));
+    }
+
     const result = await getConnection().query(
       `
-      select * from post p
+      select p.* 
+      from post p
       where p."user_id" = $1
-    `,
-      [user_id]
+      ${cursor ? `AND p."createdAt" < $3` : ''}
+      order by p."createdAt" DESC
+      limit $2
+      `,
+      args
     );
-    return result;
+    return {
+      posts: result.slice(0, postsLimit),
+      hasMore: result.length === realLimit,
+    };
+  }
+
+  @Authorized()
+  @Query(() => Post)
+  async getPost(@Arg('post_id') post_id: string) {
+    const post = await Post.findOne(post_id);
+    return post;
   }
 }
 

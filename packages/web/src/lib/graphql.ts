@@ -5,6 +5,9 @@ import {
   UseMutationOptions,
   useQuery,
   UseQueryOptions,
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
+  QueryFunctionContext,
 } from 'react-query';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -48,6 +51,23 @@ export type AddPostResponse = {
   post?: Maybe<Post>;
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  createdAt: Scalars['String'];
+  id: Scalars['String'];
+  post_id: Scalars['String'];
+  text: Scalars['String'];
+  updatedAt: Scalars['String'];
+  user: User;
+  user_id: Scalars['String'];
+};
+
+export type CommentsResponse = {
+  __typename?: 'CommentsResponse';
+  comments: Array<Comment>;
+  hasMore: Scalars['Boolean'];
+};
+
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
@@ -77,6 +97,7 @@ export type Mutation = {
   follow: FollowResponse;
   forgotPassword: ForgotPassResponse;
   logout: Scalars['Boolean'];
+  newComment: NewCommentResponse;
   resetPassword: UserResponse;
   signin: UserResponse;
   signup: UserResponse;
@@ -97,6 +118,10 @@ export type MutationFollowArgs = {
 
 export type MutationForgotPasswordArgs = {
   email: Scalars['String'];
+};
+
+export type MutationNewCommentArgs = {
+  comment_body: NewCommentInput;
 };
 
 export type MutationResetPasswordArgs = {
@@ -129,6 +154,17 @@ export type MutationUpdateProfileArgs = {
   newUser: UpdateUserInput;
 };
 
+export type NewCommentInput = {
+  post_id: Scalars['String'];
+  text: Scalars['String'];
+};
+
+export type NewCommentResponse = {
+  __typename?: 'NewCommentResponse';
+  comment?: Maybe<Comment>;
+  error?: Maybe<FieldError>;
+};
+
 export type Post = {
   __typename?: 'Post';
   caption?: Maybe<Scalars['String']>;
@@ -140,16 +176,36 @@ export type Post = {
   user_id: Scalars['String'];
 };
 
+export type PostsResponse = {
+  __typename?: 'PostsResponse';
+  hasMore: Scalars['Boolean'];
+  posts: Array<Post>;
+};
+
 export type Query = {
   __typename?: 'Query';
-  getPosts?: Maybe<Array<Post>>;
+  getComments: CommentsResponse;
+  getPost: Post;
+  getPosts: PostsResponse;
   getUserFollowers?: Maybe<Array<User>>;
   getUserFollowing?: Maybe<Array<User>>;
   getUserProfile?: Maybe<User>;
   me?: Maybe<User>;
 };
 
+export type QueryGetCommentsArgs = {
+  cursor?: InputMaybe<Scalars['String']>;
+  limit: Scalars['Int'];
+  post_id: Scalars['String'];
+};
+
+export type QueryGetPostArgs = {
+  post_id: Scalars['String'];
+};
+
 export type QueryGetPostsArgs = {
+  cursor?: InputMaybe<Scalars['String']>;
+  limit: Scalars['Int'];
   user_id: Scalars['String'];
 };
 
@@ -385,6 +441,36 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
 
 export type LogoutMutation = { __typename?: 'Mutation'; logout: boolean };
 
+export type NewCommentMutationVariables = Exact<{
+  post_id: Scalars['String'];
+  text: Scalars['String'];
+}>;
+
+export type NewCommentMutation = {
+  __typename?: 'Mutation';
+  newComment: {
+    __typename?: 'NewCommentResponse';
+    error?:
+      | { __typename?: 'FieldError'; field: string; message: string }
+      | null
+      | undefined;
+    comment?:
+      | {
+          __typename?: 'Comment';
+          id: string;
+          text: string;
+          createdAt: string;
+          user: {
+            __typename?: 'User';
+            username: string;
+            avatar?: string | null | undefined;
+          };
+        }
+      | null
+      | undefined;
+  };
+};
+
 export type ResetPasswordMutationVariables = Exact<{
   resetToken: Scalars['String'];
   newPassword: Scalars['String'];
@@ -537,6 +623,52 @@ export type UpdateProfileMutation = {
   };
 };
 
+export type GetCommentsQueryVariables = Exact<{
+  post_id: Scalars['String'];
+  cursor?: InputMaybe<Scalars['String']>;
+  limit: Scalars['Int'];
+}>;
+
+export type GetCommentsQuery = {
+  __typename?: 'Query';
+  getComments: {
+    __typename?: 'CommentsResponse';
+    hasMore: boolean;
+    comments: Array<{
+      __typename?: 'Comment';
+      id: string;
+      text: string;
+      createdAt: string;
+      user: {
+        __typename?: 'User';
+        avatar?: string | null | undefined;
+        username: string;
+      };
+    }>;
+  };
+};
+
+export type GetPostQueryVariables = Exact<{
+  post_id: Scalars['String'];
+}>;
+
+export type GetPostQuery = {
+  __typename?: 'Query';
+  getPost: {
+    __typename?: 'Post';
+    id: string;
+    post_url: string;
+    caption?: string | null | undefined;
+    createdAt: string;
+    user: {
+      __typename?: 'User';
+      username: string;
+      has_followed?: boolean | null | undefined;
+      avatar?: string | null | undefined;
+    };
+  };
+};
+
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = {
@@ -592,6 +724,27 @@ export type GetUserFollowingQuery = {
       }>
     | null
     | undefined;
+};
+
+export type GetUserPostsQueryVariables = Exact<{
+  user_id: Scalars['String'];
+  limit: Scalars['Int'];
+  cursor?: InputMaybe<Scalars['String']>;
+}>;
+
+export type GetUserPostsQuery = {
+  __typename?: 'Query';
+  getPosts: {
+    __typename?: 'PostsResponse';
+    hasMore: boolean;
+    posts: Array<{
+      __typename?: 'Post';
+      id: string;
+      post_url: string;
+      caption?: string | null | undefined;
+      createdAt: string;
+    }>;
+  };
 };
 
 export type GetUserProfileQueryVariables = Exact<{
@@ -882,6 +1035,61 @@ useLogoutMutation.fetcher = (
     variables,
     headers
   );
+export const NewCommentDocument = `
+    mutation NewComment($post_id: String!, $text: String!) {
+  newComment(comment_body: {post_id: $post_id, text: $text}) {
+    error {
+      ...Error
+    }
+    comment {
+      id
+      text
+      createdAt
+      user {
+        username
+        avatar
+      }
+    }
+  }
+}
+    ${ErrorFragmentDoc}`;
+export const useNewCommentMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    NewCommentMutation,
+    TError,
+    NewCommentMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    NewCommentMutation,
+    TError,
+    NewCommentMutationVariables,
+    TContext
+  >(
+    'NewComment',
+    (variables?: NewCommentMutationVariables) =>
+      fetcher<NewCommentMutation, NewCommentMutationVariables>(
+        client,
+        NewCommentDocument,
+        variables,
+        headers
+      )(),
+    options
+  );
+useNewCommentMutation.fetcher = (
+  client: GraphQLClient,
+  variables: NewCommentMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<NewCommentMutation, NewCommentMutationVariables>(
+    client,
+    NewCommentDocument,
+    variables,
+    headers
+  );
 export const ResetPasswordDocument = `
     mutation ResetPassword($resetToken: String!, $newPassword: String!) {
   resetPassword(resetToken: $resetToken, newPassword: $newPassword) {
@@ -1143,6 +1351,142 @@ useUpdateProfileMutation.fetcher = (
     variables,
     headers
   );
+export const GetCommentsDocument = `
+    query GetComments($post_id: String!, $cursor: String, $limit: Int!) {
+  getComments(post_id: $post_id, cursor: $cursor, limit: $limit) {
+    comments {
+      id
+      text
+      createdAt
+      user {
+        avatar
+        username
+      }
+    }
+    hasMore
+  }
+}
+    `;
+export const useGetCommentsQuery = <TData = GetCommentsQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables: GetCommentsQueryVariables,
+  options?: UseQueryOptions<GetCommentsQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetCommentsQuery, TError, TData>(
+    ['GetComments', variables],
+    fetcher<GetCommentsQuery, GetCommentsQueryVariables>(
+      client,
+      GetCommentsDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetCommentsQuery.getKey = (variables: GetCommentsQueryVariables) => [
+  'GetComments',
+  variables,
+];
+export const useInfiniteGetCommentsQuery = <
+  TData = GetCommentsQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof GetCommentsQueryVariables,
+  client: GraphQLClient,
+  variables: GetCommentsQueryVariables,
+  options?: UseInfiniteQueryOptions<GetCommentsQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<GetCommentsQuery, TError, TData>(
+    ['GetComments.infinite', variables],
+    (metaData) =>
+      fetcher<GetCommentsQuery, GetCommentsQueryVariables>(
+        client,
+        GetCommentsDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useGetCommentsQuery.fetcher = (
+  client: GraphQLClient,
+  variables: GetCommentsQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetCommentsQuery, GetCommentsQueryVariables>(
+    client,
+    GetCommentsDocument,
+    variables,
+    headers
+  );
+export const GetPostDocument = `
+    query GetPost($post_id: String!) {
+  getPost(post_id: $post_id) {
+    id
+    post_url
+    caption
+    createdAt
+    user {
+      username
+      has_followed
+      avatar
+    }
+  }
+}
+    `;
+export const useGetPostQuery = <TData = GetPostQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables: GetPostQueryVariables,
+  options?: UseQueryOptions<GetPostQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetPostQuery, TError, TData>(
+    ['GetPost', variables],
+    fetcher<GetPostQuery, GetPostQueryVariables>(
+      client,
+      GetPostDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetPostQuery.getKey = (variables: GetPostQueryVariables) => [
+  'GetPost',
+  variables,
+];
+export const useInfiniteGetPostQuery = <TData = GetPostQuery, TError = unknown>(
+  pageParamKey: keyof GetPostQueryVariables,
+  client: GraphQLClient,
+  variables: GetPostQueryVariables,
+  options?: UseInfiniteQueryOptions<GetPostQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<GetPostQuery, TError, TData>(
+    ['GetPost.infinite', variables],
+    (metaData) =>
+      fetcher<GetPostQuery, GetPostQueryVariables>(
+        client,
+        GetPostDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useGetPostQuery.fetcher = (
+  client: GraphQLClient,
+  variables: GetPostQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetPostQuery, GetPostQueryVariables>(
+    client,
+    GetPostDocument,
+    variables,
+    headers
+  );
 export const MeDocument = `
     query Me {
   me {
@@ -1164,6 +1508,25 @@ export const useMeQuery = <TData = MeQuery, TError = unknown>(
 
 useMeQuery.getKey = (variables?: MeQueryVariables) =>
   variables === undefined ? ['Me'] : ['Me', variables];
+export const useInfiniteMeQuery = <TData = MeQuery, TError = unknown>(
+  pageParamKey: keyof MeQueryVariables,
+  client: GraphQLClient,
+  variables?: MeQueryVariables,
+  options?: UseInfiniteQueryOptions<MeQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<MeQuery, TError, TData>(
+    variables === undefined ? ['Me.infinite'] : ['Me.infinite', variables],
+    (metaData) =>
+      fetcher<MeQuery, MeQueryVariables>(
+        client,
+        MeDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
 useMeQuery.fetcher = (
   client: GraphQLClient,
   variables?: MeQueryVariables,
@@ -1203,6 +1566,28 @@ export const useGetUserFollowersQuery = <
 useGetUserFollowersQuery.getKey = (
   variables: GetUserFollowersQueryVariables
 ) => ['GetUserFollowers', variables];
+export const useInfiniteGetUserFollowersQuery = <
+  TData = GetUserFollowersQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof GetUserFollowersQueryVariables,
+  client: GraphQLClient,
+  variables: GetUserFollowersQueryVariables,
+  options?: UseInfiniteQueryOptions<GetUserFollowersQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<GetUserFollowersQuery, TError, TData>(
+    ['GetUserFollowers.infinite', variables],
+    (metaData) =>
+      fetcher<GetUserFollowersQuery, GetUserFollowersQueryVariables>(
+        client,
+        GetUserFollowersDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
 useGetUserFollowersQuery.fetcher = (
   client: GraphQLClient,
   variables: GetUserFollowersQueryVariables,
@@ -1248,6 +1633,28 @@ export const useGetUserFollowingQuery = <
 useGetUserFollowingQuery.getKey = (
   variables: GetUserFollowingQueryVariables
 ) => ['GetUserFollowing', variables];
+export const useInfiniteGetUserFollowingQuery = <
+  TData = GetUserFollowingQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof GetUserFollowingQueryVariables,
+  client: GraphQLClient,
+  variables: GetUserFollowingQueryVariables,
+  options?: UseInfiniteQueryOptions<GetUserFollowingQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<GetUserFollowingQuery, TError, TData>(
+    ['GetUserFollowing.infinite', variables],
+    (metaData) =>
+      fetcher<GetUserFollowingQuery, GetUserFollowingQueryVariables>(
+        client,
+        GetUserFollowingDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
 useGetUserFollowingQuery.fetcher = (
   client: GraphQLClient,
   variables: GetUserFollowingQueryVariables,
@@ -1256,6 +1663,76 @@ useGetUserFollowingQuery.fetcher = (
   fetcher<GetUserFollowingQuery, GetUserFollowingQueryVariables>(
     client,
     GetUserFollowingDocument,
+    variables,
+    headers
+  );
+export const GetUserPostsDocument = `
+    query GetUserPosts($user_id: String!, $limit: Int!, $cursor: String) {
+  getPosts(user_id: $user_id, limit: $limit, cursor: $cursor) {
+    posts {
+      id
+      post_url
+      caption
+      createdAt
+    }
+    hasMore
+  }
+}
+    `;
+export const useGetUserPostsQuery = <
+  TData = GetUserPostsQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: GetUserPostsQueryVariables,
+  options?: UseQueryOptions<GetUserPostsQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetUserPostsQuery, TError, TData>(
+    ['GetUserPosts', variables],
+    fetcher<GetUserPostsQuery, GetUserPostsQueryVariables>(
+      client,
+      GetUserPostsDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetUserPostsQuery.getKey = (variables: GetUserPostsQueryVariables) => [
+  'GetUserPosts',
+  variables,
+];
+export const useInfiniteGetUserPostsQuery = <
+  TData = GetUserPostsQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof GetUserPostsQueryVariables,
+  client: GraphQLClient,
+  variables: GetUserPostsQueryVariables,
+  options?: UseInfiniteQueryOptions<GetUserPostsQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<GetUserPostsQuery, TError, TData>(
+    ['GetUserPosts.infinite', variables],
+    (metaData) =>
+      fetcher<GetUserPostsQuery, GetUserPostsQueryVariables>(
+        client,
+        GetUserPostsDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useGetUserPostsQuery.fetcher = (
+  client: GraphQLClient,
+  variables: GetUserPostsQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetUserPostsQuery, GetUserPostsQueryVariables>(
+    client,
+    GetUserPostsDocument,
     variables,
     headers
   );
@@ -1301,6 +1778,28 @@ useGetUserProfileQuery.getKey = (variables: GetUserProfileQueryVariables) => [
   'GetUserProfile',
   variables,
 ];
+export const useInfiniteGetUserProfileQuery = <
+  TData = GetUserProfileQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof GetUserProfileQueryVariables,
+  client: GraphQLClient,
+  variables: GetUserProfileQueryVariables,
+  options?: UseInfiniteQueryOptions<GetUserProfileQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<GetUserProfileQuery, TError, TData>(
+    ['GetUserProfile.infinite', variables],
+    (metaData) =>
+      fetcher<GetUserProfileQuery, GetUserProfileQueryVariables>(
+        client,
+        GetUserProfileDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
 useGetUserProfileQuery.fetcher = (
   client: GraphQLClient,
   variables: GetUserProfileQueryVariables,
