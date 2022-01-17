@@ -33,14 +33,17 @@ const Post = () => {
           <PostCardLoader />
         ) : (
           <PostCard
+            hideGoToPostLink={true}
             hasMoreComments={hasNextPage}
             fetchMoreComments={fetchNextPage}
             createdAt={data.getPost.createdAt}
             comments={comments}
+            likes={data.getPost.likes}
             post_id={data.getPost.id}
             post_url={data.getPost.post_url}
             caption={data.getPost.caption}
             user={{
+              id: data.getPost.user.id,
               username: data.getPost.user.username,
               avatar: data.getPost.user.avatar,
               has_followed: data.getPost.user.has_followed,

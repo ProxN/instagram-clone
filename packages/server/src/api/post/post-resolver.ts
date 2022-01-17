@@ -13,7 +13,12 @@ import {
 import { getConnection } from 'typeorm';
 import { Upload, uploadFile } from '../../lib/upload';
 import { Context } from '../../types/context';
-import { AddPostInput, AddPostResponse, PostsResponse } from '../../types/post';
+import {
+  AddPostInput,
+  AddPostResponse,
+  DeletePostResponse,
+  PostsResponse,
+} from '../../types/post';
 import Like from '../like/like-entity';
 import User from '../user/user-entity';
 import Post from './post-entity';
@@ -117,6 +122,29 @@ class PostResolver {
   async getPost(@Arg('post_id') post_id: string) {
     const post = await Post.findOne(post_id);
     return post;
+  }
+
+  @Authorized()
+  @Mutation(() => DeletePostResponse)
+  async deletePost(@Arg('post_id') post_id: string, @Ctx() { req }: Context) {
+    if (!post_id) {
+      return { error: PostErrors.PostIdRequired };
+    }
+
+    const result = await Post.delete({
+      user_id: req.session.userId,
+      id: post_id,
+    });
+
+    if (result.affected === 0)
+      return {
+        error: {
+          field: 'deletePost',
+          message: 'Something went worng! Please try again.',
+        },
+      };
+
+    return { deleted: result.affected === 1 };
   }
 }
 

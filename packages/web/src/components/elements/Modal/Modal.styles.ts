@@ -2,16 +2,16 @@ import styled from '@xstyled/styled-components';
 import { motion } from 'framer-motion';
 import { mode } from '@lib/utility/component';
 
-export const Overylay = styled(motion.div)`
+export const Overylay = styled(motion.div)<{ rgba: number }>`
   position: fixed;
   height: 100vh;
   width: 100%;
   top: 0;
   left: 0;
   z-index: 999;
-  background-color: ${({ theme }) =>
+  background-color: ${({ theme, rgba }) =>
     mode(
-      theme.colors['blackAlpha'][8],
+      theme.colors['blackAlpha'][rgba],
       theme.colors['blackAlpha'][6]
     )(theme.colorMode)};
 `;

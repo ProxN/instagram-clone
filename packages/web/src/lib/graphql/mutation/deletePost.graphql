@@ -1,0 +1,8 @@
+mutation DeletePost($post_id: String!) {
+  deletePost(post_id: $post_id) {
+    error {
+      ...Error
+    }
+    deleted
+  }
+}

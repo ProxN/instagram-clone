@@ -16,3 +16,9 @@ export class PostsResponse {
   @Field()
   hasMore!: boolean;
 }
+
+@ObjectType()
+export class DeletePostResponse extends ErrorResponse {
+  @Field(() => Boolean, { nullable: true })
+  deleted?: boolean;
+}

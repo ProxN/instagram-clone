@@ -68,6 +68,12 @@ export type CommentsResponse = {
   hasMore: Scalars['Boolean'];
 };
 
+export type DeletePostResponse = {
+  __typename?: 'DeletePostResponse';
+  deleted?: Maybe<Scalars['Boolean']>;
+  error?: Maybe<FieldError>;
+};
+
 export type FieldError = {
   __typename?: 'FieldError';
   field: Scalars['String'];
@@ -94,6 +100,7 @@ export type LoginInputs = {
 export type Mutation = {
   __typename?: 'Mutation';
   addPost: AddPostResponse;
+  deletePost: DeletePostResponse;
   follow: FollowResponse;
   forgotPassword: ForgotPassResponse;
   likePost: Scalars['Boolean'];
@@ -111,6 +118,10 @@ export type Mutation = {
 export type MutationAddPostArgs = {
   data: AddPostInput;
   file: Scalars['Upload'];
+};
+
+export type MutationDeletePostArgs = {
+  post_id: Scalars['String'];
 };
 
 export type MutationFollowArgs = {
@@ -379,6 +390,22 @@ export type AddPostMutation = {
           createdAt: string;
           updatedAt: string;
         }
+      | null
+      | undefined;
+  };
+};
+
+export type DeletePostMutationVariables = Exact<{
+  post_id: Scalars['String'];
+}>;
+
+export type DeletePostMutation = {
+  __typename?: 'Mutation';
+  deletePost: {
+    __typename?: 'DeletePostResponse';
+    deleted?: boolean | null | undefined;
+    error?:
+      | { __typename?: 'FieldError'; field: string; message: string }
       | null
       | undefined;
   };
@@ -678,6 +705,7 @@ export type GetPostQuery = {
     likes: number;
     user: {
       __typename?: 'User';
+      id: string;
       username: string;
       has_followed?: boolean | null | undefined;
       avatar?: string | null | undefined;
@@ -885,6 +913,53 @@ useAddPostMutation.fetcher = (
   fetcher<AddPostMutation, AddPostMutationVariables>(
     client,
     AddPostDocument,
+    variables,
+    headers
+  );
+export const DeletePostDocument = `
+    mutation DeletePost($post_id: String!) {
+  deletePost(post_id: $post_id) {
+    error {
+      ...Error
+    }
+    deleted
+  }
+}
+    ${ErrorFragmentDoc}`;
+export const useDeletePostMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    DeletePostMutation,
+    TError,
+    DeletePostMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    DeletePostMutation,
+    TError,
+    DeletePostMutationVariables,
+    TContext
+  >(
+    'DeletePost',
+    (variables?: DeletePostMutationVariables) =>
+      fetcher<DeletePostMutation, DeletePostMutationVariables>(
+        client,
+        DeletePostDocument,
+        variables,
+        headers
+      )(),
+    options
+  );
+useDeletePostMutation.fetcher = (
+  client: GraphQLClient,
+  variables: DeletePostMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<DeletePostMutation, DeletePostMutationVariables>(
+    client,
+    DeletePostDocument,
     variables,
     headers
   );
@@ -1486,6 +1561,7 @@ export const GetPostDocument = `
     createdAt
     likes
     user {
+      id
       username
       has_followed
       avatar

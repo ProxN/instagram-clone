@@ -56,6 +56,7 @@ const PostModal = () => {
             post_url={data.getPost.post_url}
             caption={data.getPost.caption}
             user={{
+              id: data.getPost.user.id,
               username: data.getPost.user.username,
               avatar: data.getPost.user.avatar,
               has_followed: data.getPost.user.has_followed,

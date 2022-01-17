@@ -26,7 +26,7 @@ class Like extends BaseEntity {
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
-  @ManyToOne(() => Post)
+  @ManyToOne(() => Post, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'post_id' })
   post!: Post;
 

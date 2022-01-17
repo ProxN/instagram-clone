@@ -56,9 +56,19 @@ const FadeConfig = {
   },
 };
 
-export const ModalOverylay: React.FC = ({ children, ...rest }) => {
+export const ModalOverylay: React.FC<{ rgba?: number }> = ({
+  children,
+  rgba = 8,
+  ...rest
+}) => {
   return (
-    <Overylay variants={FadeConfig} initial='exit' animate='enter' {...rest}>
+    <Overylay
+      variants={FadeConfig}
+      rgba={rgba}
+      initial='exit'
+      animate='enter'
+      {...rest}
+    >
       {children}
     </Overylay>
   );
