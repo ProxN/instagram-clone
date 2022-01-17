@@ -14,6 +14,7 @@ import { getConnection } from 'typeorm';
 import { Upload, uploadFile } from '../../lib/upload';
 import { Context } from '../../types/context';
 import { AddPostInput, AddPostResponse, PostsResponse } from '../../types/post';
+import Like from '../like/like-entity';
 import User from '../user/user-entity';
 import Post from './post-entity';
 import * as PostErrors from './post-error';
@@ -23,6 +24,27 @@ class PostResolver {
   @FieldResolver(() => User)
   async user(@Root() post: Post) {
     return User.findOne(post.user_id);
+  }
+
+  @Authorized()
+  @FieldResolver(() => Boolean)
+  async is_liked(@Root() post: Post, @Ctx() { req }: Context) {
+    const result = await Like.findOne({
+      where: { user_id: req.session.userId, post_id: post.id },
+    });
+    return !!result;
+  }
+
+  @FieldResolver(() => Number)
+  async likes(@Root() post: Post, @Ctx() { likesLoader }: Context) {
+    const result = await likesLoader.load(post.id);
+    return result ? result.likes : 0;
+  }
+
+  @FieldResolver(() => Number)
+  async comments(@Root() post: Post, @Ctx() { commentsLoader }: Context) {
+    const result = await commentsLoader.load(post.id);
+    return result ? result.comments : 0;
   }
 
   @Authorized()

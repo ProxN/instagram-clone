@@ -11,14 +11,17 @@ import { Text } from '../Text';
 import { Space } from '@components/layout/Space';
 import { AddComment } from '../AddComment';
 import { Comment } from '../Comment';
-import { GetCommentsQuery } from '@lib/graphql';
+import { GetCommentsQuery, useLikePostMutation } from '@lib/graphql';
 import { dayjs } from '@lib/utility/dayjs';
+import { client } from '@lib/utility/graphqlClient';
 
 interface PostCardProps {
   post_url: string;
   post_id: string;
   caption?: string | null;
   createdAt: string;
+  likes: number;
+  is_liked?: boolean;
   user: {
     username: string;
     avatar?: string | null;
@@ -38,12 +41,16 @@ const PostCard: React.FC<PostCardProps> = (props) => {
     caption,
     post_id,
     comments,
+    is_liked,
     createdAt,
+    likes,
     hasMoreComments,
     fetchMoreComments,
   } = props;
 
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const { mutate, data } = useLikePostMutation(client);
 
   const post_time = useMemo(() => {
     return dayjs(+createdAt).fromNow();
@@ -51,6 +58,10 @@ const PostCard: React.FC<PostCardProps> = (props) => {
 
   const handleFocusComment = () => {
     setShowCommentInput(true);
+  };
+
+  const handleLikeClick = () => {
+    mutate({ post_id });
   };
 
   useEffect(() => {
@@ -174,9 +185,15 @@ const PostCard: React.FC<PostCardProps> = (props) => {
           <Flex>
             <Space alignItems='center'>
               <IconButton
+                onClick={handleLikeClick}
                 ariaLabel='Post likes'
-                variant='ghost'
-                icon={<Icon name='heart' />}
+                variant='link'
+                color={is_liked || data?.likePost ? 'red' : ''}
+                icon={
+                  <Icon
+                    name={is_liked || data?.likePost ? 'heart-sharp' : 'heart'}
+                  />
+                }
               />
               <IconButton
                 onClick={handleFocusComment}
@@ -198,7 +215,22 @@ const PostCard: React.FC<PostCardProps> = (props) => {
           </Flex>
           <Box mt={2}>
             <Text fontWeight='semibold' display='block'>
-              4,428 likes
+              {likes === 1 ? (
+                `1 like`
+              ) : likes === 0 ? (
+                <Text>
+                  Be the first to{' '}
+                  <Text
+                    onClick={handleLikeClick}
+                    cursor='pointer'
+                    fontWeight='bold'
+                  >
+                    Like this
+                  </Text>
+                </Text>
+              ) : (
+                `${likes} likes`
+              )}
             </Text>
           </Box>
           <Text

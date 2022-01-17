@@ -31,7 +31,7 @@ const PostModal = () => {
     router.push({ pathname: router.pathname, query: rest });
   };
 
-  if (!data || !data.getPost) return null;
+  if (!(data && data.getPost)) return null;
 
   return (
     <Modal
@@ -50,7 +50,9 @@ const PostModal = () => {
             fetchMoreComments={fetchNextPage}
             createdAt={data.getPost.createdAt}
             comments={comments}
+            likes={data.getPost.likes}
             post_id={data.getPost.id}
+            is_liked={data.getPost.is_liked}
             post_url={data.getPost.post_url}
             caption={data.getPost.caption}
             user={{

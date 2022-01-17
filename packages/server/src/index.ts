@@ -29,6 +29,8 @@ import {
 } from './lib/config';
 import { createHasFollowedLoader } from './lib/loaders/createHasFollowedLoader';
 import { createUserLoader } from './lib/loaders/createUserLoader';
+import { createLikesLoader } from './lib/loaders/createLikesLoader';
+import { createCommentsLoader } from './lib/loaders/createCommentsLoader';
 
 logger.info('Starting Application');
 
@@ -88,6 +90,8 @@ const Main = async () => {
       redis,
       followLoader: createHasFollowedLoader(),
       userLoader: createUserLoader(),
+      likesLoader: createLikesLoader(),
+      commentsLoader: createCommentsLoader(),
     }),
     validationRules: [depthLimit(6)],
   });

@@ -55,7 +55,7 @@ const Avatar: React.FC<AvatarProps> = ({
       ) : (
         src && (
           <>
-            <Image layout='fill' src={src} alt={alt} {...imgProps} />
+            <Image layout='fill' src={src} alt={alt} {...imgProps} priority />
           </>
         )
       )}

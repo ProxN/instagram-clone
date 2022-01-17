@@ -3,7 +3,9 @@ query GetPost($post_id: String!) {
     id
     post_url
     caption
+    is_liked
     createdAt
+    likes
     user {
       username
       has_followed

@@ -4,6 +4,8 @@ query GetUserPosts($user_id: String!, $limit: Int!, $cursor: String) {
       id
       post_url
       caption
+      likes
+      comments
       createdAt
     }
     hasMore

@@ -95,17 +95,20 @@ const UserPosts: React.FC<{ user_id: string }> = ({ user_id }) => {
                 >
                   {/*Overlay */}
                   <PostOverlay>
-                    <Flex alignItems='center'>
-                      <IconButton
-                        ariaLabel='Post Likes'
-                        color='#fff'
-                        variant='link'
-                        icon={<Icon name='heart-sharp' />}
-                      />
-                      <Text ml={1} fontWeight='semibold' as='span'>
-                        3,453
-                      </Text>
-                    </Flex>
+                    {el.likes > 0 && (
+                      <Flex alignItems='center'>
+                        <IconButton
+                          ariaLabel='Post Likes'
+                          color='#fff'
+                          variant='link'
+                          icon={<Icon name='heart-sharp' />}
+                        />
+                        <Text ml={1} fontWeight='semibold' as='span'>
+                          {el.likes}
+                        </Text>
+                      </Flex>
+                    )}
+
                     <Flex ml={5} alignItems='center'>
                       <IconButton
                         ariaLabel='Post Comments'
@@ -114,7 +117,7 @@ const UserPosts: React.FC<{ user_id: string }> = ({ user_id }) => {
                         icon={<Icon name='chat-sharp' />}
                       />
                       <Text ml={1} fontWeight='semibold' as='span'>
-                        16
+                        {el.comments}
                       </Text>
                     </Flex>
                   </PostOverlay>

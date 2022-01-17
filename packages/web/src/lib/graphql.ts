@@ -96,6 +96,7 @@ export type Mutation = {
   addPost: AddPostResponse;
   follow: FollowResponse;
   forgotPassword: ForgotPassResponse;
+  likePost: Scalars['Boolean'];
   logout: Scalars['Boolean'];
   newComment: NewCommentResponse;
   resetPassword: UserResponse;
@@ -118,6 +119,10 @@ export type MutationFollowArgs = {
 
 export type MutationForgotPasswordArgs = {
   email: Scalars['String'];
+};
+
+export type MutationLikePostArgs = {
+  post_id: Scalars['String'];
 };
 
 export type MutationNewCommentArgs = {
@@ -168,8 +173,11 @@ export type NewCommentResponse = {
 export type Post = {
   __typename?: 'Post';
   caption?: Maybe<Scalars['String']>;
+  comments: Scalars['Float'];
   createdAt: Scalars['String'];
   id: Scalars['ID'];
+  is_liked: Scalars['Boolean'];
+  likes: Scalars['Float'];
   post_url: Scalars['String'];
   updatedAt: Scalars['String'];
   user: User;
@@ -407,6 +415,12 @@ export type ForgotPasswordMutation = {
       | undefined;
   };
 };
+
+export type LikePostMutationVariables = Exact<{
+  post_id: Scalars['String'];
+}>;
+
+export type LikePostMutation = { __typename?: 'Mutation'; likePost: boolean };
 
 export type SigninMutationVariables = Exact<{
   email: Scalars['String'];
@@ -659,7 +673,9 @@ export type GetPostQuery = {
     id: string;
     post_url: string;
     caption?: string | null | undefined;
+    is_liked: boolean;
     createdAt: string;
+    likes: number;
     user: {
       __typename?: 'User';
       username: string;
@@ -742,6 +758,8 @@ export type GetUserPostsQuery = {
       id: string;
       post_url: string;
       caption?: string | null | undefined;
+      likes: number;
+      comments: number;
       createdAt: string;
     }>;
   };
@@ -956,6 +974,43 @@ useForgotPasswordMutation.fetcher = (
   fetcher<ForgotPasswordMutation, ForgotPasswordMutationVariables>(
     client,
     ForgotPasswordDocument,
+    variables,
+    headers
+  );
+export const LikePostDocument = `
+    mutation LikePost($post_id: String!) {
+  likePost(post_id: $post_id)
+}
+    `;
+export const useLikePostMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    LikePostMutation,
+    TError,
+    LikePostMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<LikePostMutation, TError, LikePostMutationVariables, TContext>(
+    'LikePost',
+    (variables?: LikePostMutationVariables) =>
+      fetcher<LikePostMutation, LikePostMutationVariables>(
+        client,
+        LikePostDocument,
+        variables,
+        headers
+      )(),
+    options
+  );
+useLikePostMutation.fetcher = (
+  client: GraphQLClient,
+  variables: LikePostMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<LikePostMutation, LikePostMutationVariables>(
+    client,
+    LikePostDocument,
     variables,
     headers
   );
@@ -1427,7 +1482,9 @@ export const GetPostDocument = `
     id
     post_url
     caption
+    is_liked
     createdAt
+    likes
     user {
       username
       has_followed
@@ -1673,6 +1730,8 @@ export const GetUserPostsDocument = `
       id
       post_url
       caption
+      likes
+      comments
       createdAt
     }
     hasMore
