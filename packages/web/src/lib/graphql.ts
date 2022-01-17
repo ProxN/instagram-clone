@@ -210,6 +210,7 @@ export type Query = {
   getUserFollowing?: Maybe<Array<User>>;
   getUserProfile?: Maybe<User>;
   me?: Maybe<User>;
+  userFeeds: PostsResponse;
 };
 
 export type QueryGetCommentsArgs = {
@@ -238,6 +239,11 @@ export type QueryGetUserFollowingArgs = {
 
 export type QueryGetUserProfileArgs = {
   username: Scalars['String'];
+};
+
+export type QueryUserFeedsArgs = {
+  cursor?: InputMaybe<Scalars['String']>;
+  limit: Scalars['Int'];
 };
 
 export type SignupInputs = {
@@ -730,6 +736,36 @@ export type MeQuery = {
       }
     | null
     | undefined;
+};
+
+export type UserFeedsQueryVariables = Exact<{
+  cursor?: InputMaybe<Scalars['String']>;
+  limit: Scalars['Int'];
+}>;
+
+export type UserFeedsQuery = {
+  __typename?: 'Query';
+  userFeeds: {
+    __typename?: 'PostsResponse';
+    hasMore: boolean;
+    posts: Array<{
+      __typename?: 'Post';
+      id: string;
+      post_url: string;
+      caption?: string | null | undefined;
+      likes: number;
+      comments: number;
+      createdAt: string;
+      is_liked: boolean;
+      user: {
+        __typename?: 'User';
+        id: string;
+        username: string;
+        avatar?: string | null | undefined;
+        has_followed?: boolean | null | undefined;
+      };
+    }>;
+  };
 };
 
 export type GetUserFollowersQueryVariables = Exact<{
@@ -1665,6 +1701,82 @@ useMeQuery.fetcher = (
   variables?: MeQueryVariables,
   headers?: RequestInit['headers']
 ) => fetcher<MeQuery, MeQueryVariables>(client, MeDocument, variables, headers);
+export const UserFeedsDocument = `
+    query UserFeeds($cursor: String, $limit: Int!) {
+  userFeeds(cursor: $cursor, limit: $limit) {
+    hasMore
+    posts {
+      id
+      post_url
+      caption
+      likes
+      comments
+      createdAt
+      is_liked
+      user {
+        id
+        username
+        avatar
+        has_followed
+      }
+    }
+  }
+}
+    `;
+export const useUserFeedsQuery = <TData = UserFeedsQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables: UserFeedsQueryVariables,
+  options?: UseQueryOptions<UserFeedsQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<UserFeedsQuery, TError, TData>(
+    ['UserFeeds', variables],
+    fetcher<UserFeedsQuery, UserFeedsQueryVariables>(
+      client,
+      UserFeedsDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useUserFeedsQuery.getKey = (variables: UserFeedsQueryVariables) => [
+  'UserFeeds',
+  variables,
+];
+export const useInfiniteUserFeedsQuery = <
+  TData = UserFeedsQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof UserFeedsQueryVariables,
+  client: GraphQLClient,
+  variables: UserFeedsQueryVariables,
+  options?: UseInfiniteQueryOptions<UserFeedsQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<UserFeedsQuery, TError, TData>(
+    ['UserFeeds.infinite', variables],
+    (metaData) =>
+      fetcher<UserFeedsQuery, UserFeedsQueryVariables>(
+        client,
+        UserFeedsDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useUserFeedsQuery.fetcher = (
+  client: GraphQLClient,
+  variables: UserFeedsQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<UserFeedsQuery, UserFeedsQueryVariables>(
+    client,
+    UserFeedsDocument,
+    variables,
+    headers
+  );
 export const GetUserFollowersDocument = `
     query GetUserFollowers($user_id: String!) {
   getUserFollowers(user_id: $user_id) {

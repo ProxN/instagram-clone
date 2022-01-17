@@ -146,6 +146,39 @@ class PostResolver {
 
     return { deleted: result.affected === 1 };
   }
+
+  @Authorized()
+  @Query(() => PostsResponse)
+  async userFeeds(
+    @Ctx() { req }: Context,
+    @Arg('cursor', () => String, { nullable: true }) cursor: string | null,
+    @Arg('limit', () => Int) limit: number
+  ) {
+    const postsLimit = Math.min(30, limit);
+    const realLimit = postsLimit + 1;
+    const args: any[] = [req.session.userId, realLimit];
+
+    if (cursor) {
+      args.push(new Date(+cursor));
+    }
+
+    const result = await getConnection().query(
+      `
+      select p.* 
+      from post p
+      inner join public.follow f ON f."follower_id" = p."user_id"
+      where f."user_id" = $1
+      ${cursor ? `AND p."createdAt" < $3 ` : ''}
+      order by p."createdAt" DESC
+      limit $2
+      `,
+      args
+    );
+    return {
+      posts: result.slice(0, postsLimit),
+      hasMore: result.length === realLimit,
+    };
+  }
 }
 
 export default PostResolver;

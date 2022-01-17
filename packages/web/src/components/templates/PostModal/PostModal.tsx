@@ -39,7 +39,7 @@ const PostModal = () => {
       size={desktopScreen ? 'xl' : 'lg'}
       isOpen={!!router.query.postId}
     >
-      <ModalOverylay />
+      <ModalOverylay rgba={8} />
       <ModalContent>
         <CloseModalButton isFixed />
         {isLoading ? (

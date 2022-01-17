@@ -1,0 +1,20 @@
+query UserFeeds($cursor: String, $limit: Int!) {
+  userFeeds(cursor: $cursor, limit: $limit) {
+    hasMore
+    posts {
+      id
+      post_url
+      caption
+      likes
+      comments
+      createdAt
+      is_liked
+      user {
+        id
+        username
+        avatar
+        has_followed
+      }
+    }
+  }
+}

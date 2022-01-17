@@ -1,6 +1,6 @@
+import ContentLoader from 'react-content-loader';
 import { useUp } from '@xstyled/styled-components';
 import { Box } from '@components/layout/Box';
-import ContentLoader from 'react-content-loader';
 import { FollowLoader } from '../FollowLoader';
 import { Loader } from '../Loader';
 import { Flex } from '@components/layout/Flex';

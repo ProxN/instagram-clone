@@ -3,15 +3,15 @@ import { useEffect, useState } from 'react';
 
 export const useShow = (breakpoints: string[]) => {
   const breakpoint = useBreakpoint();
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     if (breakpoint && breakpoints.includes(breakpoint)) {
-      setShowSuggestions(true);
+      setShow(true);
     } else {
-      setShowSuggestions(false);
+      setShow(false);
     }
   }, [breakpoint, breakpoints]);
 
-  return { showSuggestions };
+  return { show };
 };
