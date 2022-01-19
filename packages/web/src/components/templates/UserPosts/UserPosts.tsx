@@ -10,7 +10,7 @@ import { PostContainer, PostOverlay } from './UserPosts.styles';
 import { IconButton } from '@components/elements/IconButton';
 import { Icon } from '@components/elements/Icon';
 import { useInterSectionObserver } from '@lib/hooks/useInterSectionObserver';
-import { PostModal } from '../PostModal';
+import { PostModal } from '../../elements/PostModal';
 import { useRouter } from 'next/router';
 
 const UserPosts: React.FC<{ user_id: string }> = ({ user_id }) => {
@@ -136,7 +136,6 @@ const UserPosts: React.FC<{ user_id: string }> = ({ user_id }) => {
           </Fragment>
         ))}
       </Box>
-
       {!!router.query.postId && <PostModal />}
     </>
   );

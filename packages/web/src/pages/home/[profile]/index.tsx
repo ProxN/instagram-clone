@@ -1,3 +1,4 @@
+import Error from 'next/error';
 import { useRouter } from 'next/router';
 import { NextPageContext } from 'next';
 import NextLink from 'next/link';
@@ -15,6 +16,7 @@ import {
   useFollowMutation,
   useGetUserProfileQuery,
   useMeQuery,
+  useUnFollowMutation,
 } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { Loader } from '@components/elements/Loader';
@@ -23,7 +25,7 @@ import { useDisclosure } from '@lib/hooks/useDisclosure';
 import { UserPosts } from '@components/templates/UserPosts';
 import { FollowersModal } from '@components/templates/FollowersModal';
 import FollowingModal from '@components/templates/FollowingModal/FollowingModal';
-import { UnFollowModal } from '@components/templates/UnFollowModal';
+import { UnFollowModal } from '@components/elements/UnFollowModal';
 
 const Profile = ({ username }: { username: string }) => {
   const router = useRouter();
@@ -54,6 +56,23 @@ const Profile = ({ username }: { username: string }) => {
         }
       },
     });
+  const { mutate: unFollowMutation, isLoading: unFollowLoading } =
+    useUnFollowMutation(client, {
+      onSuccess: (data) => {
+        if (data.unFollow.result) {
+          queryClient.setQueryData<GetUserProfileQuery>(
+            useGetUserProfileQuery.getKey({ username }),
+            (old: any) => {
+              return {
+                ...old,
+                getUserProfile: { ...old?.getUserProfile, has_followed: false },
+              };
+            }
+          );
+        }
+        onClose();
+      },
+    });
 
   const currentUser = queryClient.getQueryData<MeQuery>(useMeQuery.getKey());
 
@@ -64,11 +83,16 @@ const Profile = ({ username }: { username: string }) => {
       </Flex>
     );
 
-  if (!data || !data.getUserProfile) return null;
+  if (!data || !data.getUserProfile) return <Error statusCode={404} />;
 
   const followHandler = () => {
     if (!data.getUserProfile?.id) return;
     followMutation({ follower_id: data.getUserProfile.id });
+  };
+
+  const unFollowHandler = () => {
+    if (!data.getUserProfile?.id) return;
+    unFollowMutation({ follower_id: data.getUserProfile.id });
   };
 
   return (
@@ -171,6 +195,7 @@ const Profile = ({ username }: { username: string }) => {
                       query: { ...router.query, followers: 'list' },
                     }}
                     as={`${router.asPath}/followers`}
+                    scroll={false}
                   >
                     <Box cursor='pointer' mr={8}>
                       <Text
@@ -193,6 +218,7 @@ const Profile = ({ username }: { username: string }) => {
                       query: { ...router.query, following: 'list' },
                     }}
                     as={`${router.asPath}/following`}
+                    scroll={false}
                   >
                     <Box cursor='pointer'>
                       <Text
@@ -374,6 +400,8 @@ const Profile = ({ username }: { username: string }) => {
       {/* Modal */}
       <SettingsModal isOpen={settingsOpen} onClose={onCloseSettings} />
       <UnFollowModal
+        isLoading={unFollowLoading}
+        handleUnFollow={unFollowHandler}
         id={data.getUserProfile.id}
         username={username}
         isOpen={isOpen}
@@ -407,19 +435,6 @@ export async function getServerSideProps(context: NextPageContext) {
     useGetUserProfileQuery.getKey({ username }),
     useGetUserProfileQuery.fetcher(client, { username }, headers)
   );
-
-  // const userProfile = queryClient.getQueryData<GetUserProfileQuery>(
-  //   useGetUserProfileQuery.getKey({ username })
-  // );
-
-  // if (userProfile && userProfile.getUserProfile) {
-  //   const user_id = userProfile.getUserProfile.id;
-  //   await queryClient.prefetchInfiniteQuery(
-  //     'cursor',
-  //     useGetUserPostsQuery.getKey({ user_id, limit: 30, cursor: null }),
-  //     useGetUserPostsQuery.fetcher(client, { user_id, limit: 30 })
-  //   );
-  // }
 
   return {
     props: {

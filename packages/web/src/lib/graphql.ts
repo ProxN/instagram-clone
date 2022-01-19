@@ -86,6 +86,12 @@ export type FollowResponse = {
   result?: Maybe<Scalars['Boolean']>;
 };
 
+export type FollowSuggestionResponse = {
+  __typename?: 'FollowSuggestionResponse';
+  hasMore: Scalars['Boolean'];
+  users: Array<User>;
+};
+
 export type ForgotPassResponse = {
   __typename?: 'ForgotPassResponse';
   emailSent?: Maybe<Scalars['Boolean']>;
@@ -203,6 +209,7 @@ export type PostsResponse = {
 
 export type Query = {
   __typename?: 'Query';
+  followerSuggestion: FollowSuggestionResponse;
   getComments: CommentsResponse;
   getPost: Post;
   getPosts: PostsResponse;
@@ -211,6 +218,11 @@ export type Query = {
   getUserProfile?: Maybe<User>;
   me?: Maybe<User>;
   userFeeds: PostsResponse;
+};
+
+export type QueryFollowerSuggestionArgs = {
+  cursor?: InputMaybe<Array<Scalars['String']>>;
+  limit: Scalars['Int'];
 };
 
 export type QueryGetCommentsArgs = {
@@ -667,6 +679,28 @@ export type UpdateProfileMutation = {
         }
       | null
       | undefined;
+  };
+};
+
+export type FollowerSuggestionQueryVariables = Exact<{
+  cursor?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
+  limit: Scalars['Int'];
+}>;
+
+export type FollowerSuggestionQuery = {
+  __typename?: 'Query';
+  followerSuggestion: {
+    __typename?: 'FollowSuggestionResponse';
+    hasMore: boolean;
+    users: Array<{
+      __typename?: 'User';
+      id: string;
+      name: string;
+      username: string;
+      avatar?: string | null | undefined;
+      has_followed?: boolean | null | undefined;
+      createdAt: string;
+    }>;
   };
 };
 
@@ -1514,6 +1548,77 @@ useUpdateProfileMutation.fetcher = (
   fetcher<UpdateProfileMutation, UpdateProfileMutationVariables>(
     client,
     UpdateProfileDocument,
+    variables,
+    headers
+  );
+export const FollowerSuggestionDocument = `
+    query FollowerSuggestion($cursor: [String!], $limit: Int!) {
+  followerSuggestion(cursor: $cursor, limit: $limit) {
+    hasMore
+    users {
+      id
+      name
+      username
+      avatar
+      has_followed
+      createdAt
+    }
+  }
+}
+    `;
+export const useFollowerSuggestionQuery = <
+  TData = FollowerSuggestionQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: FollowerSuggestionQueryVariables,
+  options?: UseQueryOptions<FollowerSuggestionQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FollowerSuggestionQuery, TError, TData>(
+    ['FollowerSuggestion', variables],
+    fetcher<FollowerSuggestionQuery, FollowerSuggestionQueryVariables>(
+      client,
+      FollowerSuggestionDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useFollowerSuggestionQuery.getKey = (
+  variables: FollowerSuggestionQueryVariables
+) => ['FollowerSuggestion', variables];
+export const useInfiniteFollowerSuggestionQuery = <
+  TData = FollowerSuggestionQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof FollowerSuggestionQueryVariables,
+  client: GraphQLClient,
+  variables: FollowerSuggestionQueryVariables,
+  options?: UseInfiniteQueryOptions<FollowerSuggestionQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<FollowerSuggestionQuery, TError, TData>(
+    ['FollowerSuggestion.infinite', variables],
+    (metaData) =>
+      fetcher<FollowerSuggestionQuery, FollowerSuggestionQueryVariables>(
+        client,
+        FollowerSuggestionDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useFollowerSuggestionQuery.fetcher = (
+  client: GraphQLClient,
+  variables: FollowerSuggestionQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<FollowerSuggestionQuery, FollowerSuggestionQueryVariables>(
+    client,
+    FollowerSuggestionDocument,
     variables,
     headers
   );

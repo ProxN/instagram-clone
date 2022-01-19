@@ -52,7 +52,6 @@ const PostOption: React.FC<PostOptionProps> = ({
               </Button>
             </Box>
           )}
-
           <Box borderBottom='1px solid' borderColor='blackAlpha.2'>
             <Button fullWidth variant='ghost' color='red'>
               Report

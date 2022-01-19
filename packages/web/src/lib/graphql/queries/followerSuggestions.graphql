@@ -1,0 +1,13 @@
+query FollowerSuggestion($cursor: [String!], $limit: Int!) {
+  followerSuggestion(cursor: $cursor, limit: $limit) {
+    hasMore
+    users {
+      id
+      name
+      username
+      avatar
+      has_followed
+      createdAt
+    }
+  }
+}

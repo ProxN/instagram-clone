@@ -38,6 +38,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
       element.style.overflow = 'auto';
     };
   }, [isOpen]);
+
   return (
     <ModalContext.Provider value={{ isOpen, ...rest }}>
       <AnimatePresence>{isOpen && <Portal>{children}</Portal>}</AnimatePresence>

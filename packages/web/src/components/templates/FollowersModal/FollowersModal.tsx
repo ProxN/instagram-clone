@@ -13,6 +13,7 @@ import { Text } from '@components/elements/Text';
 import { Box } from '@components/layout/Box';
 import { useGetUserFollowersQuery } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
+import { Suggestions } from '@components/elements/Suggestions';
 
 const FollowersModal: React.FC<{ user_id: string; currentUser: boolean }> = ({
   user_id,
@@ -24,7 +25,9 @@ const FollowersModal: React.FC<{ user_id: string; currentUser: boolean }> = ({
 
   const handleClose = () => {
     const { ['followers']: _, ...rest } = router.query;
-    router.push({ pathname: router.pathname, query: rest });
+    router.push({ pathname: router.pathname, query: rest }, undefined, {
+      scroll: false,
+    });
   };
 
   return (
@@ -52,9 +55,6 @@ const FollowersModal: React.FC<{ user_id: string; currentUser: boolean }> = ({
             <Box>
               {data?.getUserFollowers?.map((el) => (
                 <Follow
-                  buttonProps={{
-                    variant: 'outline',
-                  }}
                   id={el.id}
                   buttonText='remove'
                   name={el.name}
@@ -64,6 +64,9 @@ const FollowersModal: React.FC<{ user_id: string; currentUser: boolean }> = ({
                   key={el.id}
                 />
               ))}
+              <Box mt={4}>
+                <Suggestions limit={30} hideSeeAll maxW='100%' />
+              </Box>
             </Box>
           )}
         </ModalBody>

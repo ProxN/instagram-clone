@@ -1,7 +1,15 @@
-import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+} from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { Context } from '../../types/context';
-import { FollowResponse } from '../../types/follow';
+import { FollowResponse, FollowSuggestionResponse } from '../../types/follow';
 import User from '../user/user-entity';
 import Follow from './follow-entity';
 import * as followErrors from './follow-errors';
@@ -90,6 +98,44 @@ class FollowResolver {
       [user_id]
     );
     return following;
+  }
+  @Authorized()
+  @Query(() => FollowSuggestionResponse)
+  async followerSuggestion(
+    @Arg('cursor', () => [String], { nullable: true }) cursor: string[],
+    @Arg('limit', () => Int) limit: number,
+    @Ctx() { req }: Context
+  ) {
+    const followersLimit = Math.min(30, limit);
+    const realLimit = followersLimit + 1;
+    const args: any[] = [req.session.userId, realLimit];
+
+    if (cursor) {
+      args.push(new Date(+cursor[0]));
+      args.push(cursor[1]);
+    }
+
+    const result = await getConnection().query(
+      `
+      select u.*
+      from public.user u
+      where u."id" NOT IN (
+        select f."follower_id" 
+        from follow f
+        where f."user_id" = $1
+        )
+      AND u."id" != $1
+      ${cursor ? `AND (u."createdAt", u."id") < ($3,$4)` : ''}
+      order by u."createdAt" DESC , u."id" DESC
+      limit $2
+      `,
+      args
+    );
+
+    return {
+      users: result.slice(0, followersLimit),
+      hasMore: result.length === realLimit,
+    };
   }
 }
 

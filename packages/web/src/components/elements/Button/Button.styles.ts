@@ -54,6 +54,7 @@ const BaseButton = styled.button.withConfig({
   transition-duration: normal;
   transition-timing-function: ease-in-out;
   background: transparent;
+  text-transform: capitalize;
   user-select: none;
   border: 1px solid transparent;
   line-height: 1.54;

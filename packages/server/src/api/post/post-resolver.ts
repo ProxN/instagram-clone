@@ -118,7 +118,7 @@ class PostResolver {
   }
 
   @Authorized()
-  @Query(() => Post)
+  @Query(() => Post, { nullable: true })
   async getPost(@Arg('post_id') post_id: string) {
     const post = await Post.findOne(post_id);
     return post;
@@ -166,9 +166,10 @@ class PostResolver {
       `
       select p.* 
       from post p
-      inner join public.follow f ON f."follower_id" = p."user_id"
-      where f."user_id" = $1
-      ${cursor ? `AND p."createdAt" < $3 ` : ''}
+      inner join public.user u ON u."id" = p."user_id"
+      left join follow f ON f."follower_id" = p."user_id"
+      where u."id" = $1 OR f."user_id" = $1
+      ${cursor ? `AND p."createdAt" < $3` : ''}
       order by p."createdAt" DESC
       limit $2
       `,

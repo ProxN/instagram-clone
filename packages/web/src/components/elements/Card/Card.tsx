@@ -1,11 +1,15 @@
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import NextLink from 'next/link';
-import { useUp } from '@xstyled/styled-components';
 import Image from 'next/image';
+import { useUp } from '@xstyled/styled-components';
 import { Box } from '@components/layout/Box';
 import { Flex } from '@components/layout/Flex';
-import { useLikePostMutation } from '@lib/graphql';
+import {
+  useDeletePostMutation,
+  useLikePostMutation,
+  UserFeedsQuery,
+} from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { AddComment } from '../AddComment';
 import { Avatar } from '../Avatar';
@@ -17,6 +21,9 @@ import { useInputFocus } from '@lib/hooks/useInputFocus';
 import { dayjs } from '@lib/utility/dayjs';
 import { PostOption } from '../PostOption';
 import { useDisclosure } from '@lib/hooks/useDisclosure';
+import { DeletePostModal } from '../DeletePostModal';
+import { InfiniteData, useQueryClient } from 'react-query';
+import toast from 'react-hot-toast';
 
 interface CardProps {
   post: {
@@ -39,12 +46,72 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ post, user }) => {
   const isDesktop = useUp('md');
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const {
+    isOpen: deleteIsOpen,
+    onClose: deleteOnClose,
+    onOpen: deleteOnOpen,
+  } = useDisclosure();
   const [showMoreText, setShowMoreText] = useState(false);
-  const { mutate, data } = useLikePostMutation(client);
   const { inputFocus, handleFocusInput, inputRef } = useInputFocus();
+  const { mutate, data } = useLikePostMutation(client, {
+    onSuccess: (data) => {
+      let addOrSub = 0;
+      if (data.likePost) addOrSub = +1;
+      else addOrSub = -1;
+      queryClient.setQueryData<InfiniteData<UserFeedsQuery>>(
+        ['UserFeeds.infinite', { limit: 30 }],
+        (old) => {
+          const newData = old?.pages.map((page) => ({
+            ...page,
+            userFeeds: {
+              ...page.userFeeds,
+              posts: page.userFeeds.posts.map((el) =>
+                el.id === post.id
+                  ? {
+                      ...el,
+                      likes: el.likes + addOrSub,
+                      is_liked: data.likePost,
+                    }
+                  : el
+              ),
+            },
+          }));
+          return { ...old, pages: newData } as InfiniteData<UserFeedsQuery>;
+        }
+      );
+    },
+  });
+
+  const { mutate: deletePost, isLoading: deleteLoading } =
+    useDeletePostMutation(client, {
+      onSuccess: (data) => {
+        if (data.deletePost.deleted) {
+          queryClient.setQueriesData<InfiniteData<UserFeedsQuery>>(
+            ['UserFeeds.infinite', { limit: 30 }],
+            (old) => {
+              const newData = old?.pages.map((page) => ({
+                ...page,
+                userFeeds: {
+                  ...page.userFeeds,
+                  posts: page.userFeeds.posts.filter((el) => el.id !== post.id),
+                },
+              }));
+              return { ...old, pages: newData } as InfiniteData<UserFeedsQuery>;
+            }
+          );
+          toast.success('Post deleted.');
+        }
+      },
+    });
+
   const handleLikeClick = () => {
     mutate({ post_id: post.id });
+  };
+
+  const handleDeleteClick = () => {
+    deletePost({ post_id: post.id });
   };
 
   const post_time = useMemo(() => {
@@ -131,6 +198,7 @@ const Card: React.FC<CardProps> = ({ post, user }) => {
                 query: { ...router.query, postId: post.id },
               }}
               as={`/home/p/${post.id}`}
+              scroll={false}
             >
               <Text cursor='pointer' color='gray'>
                 View all {post.comments} comments
@@ -151,7 +219,14 @@ const Card: React.FC<CardProps> = ({ post, user }) => {
         user_id={user.id}
         isOpen={isOpen}
         onClose={onClose}
+        handleDeleteOpen={deleteOnOpen}
         has_followed={user.has_followed}
+      />
+      <DeletePostModal
+        isOpen={deleteIsOpen}
+        onClose={deleteOnClose}
+        handleDeleteClick={handleDeleteClick}
+        isLoading={deleteLoading}
       />
     </>
   );

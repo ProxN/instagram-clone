@@ -28,7 +28,9 @@ const PostModal = () => {
 
   const handlePostClose = () => {
     const { ['postId']: _, ...rest } = router.query;
-    router.push({ pathname: router.pathname, query: rest });
+    router.push({ pathname: router.pathname, query: rest }, undefined, {
+      scroll: false,
+    });
   };
 
   if (!(data && data.getPost)) return null;

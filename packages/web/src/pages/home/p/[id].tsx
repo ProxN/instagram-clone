@@ -1,3 +1,4 @@
+import Error from 'next/error';
 import { useRouter } from 'next/router';
 import { PostCard } from '@components/elements/PostCard';
 import { Box } from '@components/layout/Box';
@@ -18,7 +19,7 @@ const Post = () => {
     fetchNextPage,
   } = useGetComments(post_id);
 
-  if (!data || !data.getPost) return null;
+  if (!data || !data.getPost) return <Error statusCode={404} />;
 
   return (
     <Box as='section' padding='5rem 0'>

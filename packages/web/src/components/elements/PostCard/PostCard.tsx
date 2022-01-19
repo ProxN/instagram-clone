@@ -24,13 +24,12 @@ import {
 } from '@lib/graphql';
 import { dayjs } from '@lib/utility/dayjs';
 import { client } from '@lib/utility/graphqlClient';
-import { Modal, ModalBody, ModalContent, ModalOverylay } from '../Modal';
-import { Button } from '../Button';
 import { useDisclosure } from '@lib/hooks/useDisclosure';
 import { useRouter } from 'next/router';
 import { CardFooter } from '../CardFooter';
 import { useInputFocus } from '@lib/hooks/useInputFocus';
 import { PostOption } from '../PostOption';
+import { DeletePostModal } from '../DeletePostModal';
 
 interface PostCardProps {
   post_url: string;
@@ -265,43 +264,12 @@ const PostCard: React.FC<PostCardProps> = (props) => {
         handleDeleteOpen={deleteOnOpen}
       />
       {/* Delete Post Modal */}
-      <Modal size='sm' isOpen={deleteIsOpen} onClose={deleteOnClose}>
-        <ModalOverylay rgba={5} />
-        <ModalContent>
-          <ModalBody p='0'>
-            <Flex
-              padding='1.5rem 0'
-              flexDirection='column'
-              alignItems='center'
-              borderBottom='1px solid'
-              borderColor='blackAlpha.3'
-            >
-              <Text mb={2} as='h2' size='lg' fontWeight='semibold'>
-                Delete Post?
-              </Text>
-              <Text as='span' color='gray'>
-                Are you sure you want to delete this post?
-              </Text>
-            </Flex>
-            <Box borderBottom='1px solid' borderColor='blackAlpha.3'>
-              <Button
-                onClick={handleDeleteClick}
-                isDisabled={deletePostLoading}
-                fullWidth
-                variant='ghost'
-                color='red'
-              >
-                {deletePostLoading ? 'Deleting' : 'delete'}
-              </Button>
-            </Box>
-            <Box>
-              <Button onClick={deleteOnClose} fullWidth variant='ghost'>
-                Cancal
-              </Button>
-            </Box>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <DeletePostModal
+        isOpen={deleteIsOpen}
+        onClose={deleteOnClose}
+        handleDeleteClick={handleDeleteClick}
+        isLoading={deletePostLoading}
+      />
     </>
   );
 };
