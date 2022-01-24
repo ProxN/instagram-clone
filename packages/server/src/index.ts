@@ -4,6 +4,14 @@ config({ path: './config.env' });
 
 import express from 'express';
 import session from 'express-session';
+import { execute, subscribe } from 'graphql';
+import { createServer } from 'http';
+import {
+  ConnectionContext,
+  SubscriptionServer,
+} from 'subscriptions-transport-ws';
+import { PubSub } from 'graphql-subscriptions';
+
 import { buildSchema } from 'type-graphql';
 import { ApolloServer } from 'apollo-server-express';
 import expressPlayground from 'graphql-playground-middleware-express';
@@ -48,6 +56,8 @@ const Main = async () => {
 
   const RedisStore = connectRedis(session);
   const redis = new Redis('127.0.0.1:6379');
+  const pubSub = new PubSub();
+  const httpServer = createServer(app);
 
   app.set('trust proxy', 1);
   app.use(helmet({ contentSecurityPolicy: IS_PROD ? undefined : false }));
@@ -60,48 +70,94 @@ const Main = async () => {
   );
   app.use(cookieParser());
 
-  app.use(
-    session({
-      store: new RedisStore({
-        client: redis,
-        disableTouch: true,
-      }),
-      name: 'sid',
-      secret: SESSION_SECRET || 'secret',
-      saveUninitialized: false,
-      resave: false,
-      cookie: {
-        httpOnly: true,
-        secure: IS_PROD,
-        maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
-      },
-    })
-  );
+  const sessionMiddleware = session({
+    store: new RedisStore({
+      client: redis,
+      disableTouch: true,
+    }),
+    name: 'sid',
+    secret: SESSION_SECRET || 'secret',
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+      httpOnly: true,
+      secure: IS_PROD,
+      maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+    },
+  });
+
+  app.use(sessionMiddleware);
+
+  const schema = await buildSchema({
+    resolvers,
+    validate: false,
+    authChecker,
+    pubSub,
+  });
 
   const apolloServer = new ApolloServer({
-    schema: await buildSchema({
-      resolvers,
-      validate: false,
-      authChecker,
-    }),
+    schema,
     context: ({ req, res }) => ({
       req,
       res,
       redis,
+      pubSub,
       followLoader: createHasFollowedLoader(),
       userLoader: createUserLoader(),
       likesLoader: createLikesLoader(),
       commentsLoader: createCommentsLoader(),
     }),
     validationRules: [depthLimit(6)],
+    plugins: [
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              subscriptionServer.close();
+            },
+          };
+        },
+      },
+    ],
   });
+
+  const subscriptionServer = SubscriptionServer.create(
+    {
+      schema,
+      execute,
+      subscribe,
+      onConnect: async (
+        connectionParams: Record<string, unknown>,
+        ws: any,
+        ctx: ConnectionContext
+      ) => {
+        return new Promise((resolve) => {
+          const req = ctx.request as express.Request;
+          const res = {} as any as express.Response;
+          sessionMiddleware(req, res, () => {
+            const userId = req.session && req.session.userId;
+            resolve({ userId });
+          });
+        });
+      },
+    },
+    { server: httpServer, path: apolloServer.graphqlPath }
+  );
 
   await apolloServer.start();
 
-  app.get('/graphql', expressPlayground({ endpoint: '/graphql' }));
+  app.get(
+    '/graphql',
+    expressPlayground({
+      endpoint: '/graphql',
+      subscriptionEndpoint: `/graphql`,
+    })
+  );
   apolloServer.applyMiddleware({ app, cors: false });
 
-  app.listen(PORT, () => logger.info(`> Ready on http://localhost:${PORT}`));
+  httpServer.listen(PORT, () =>
+    logger.info(`> Ready on http://localhost:${PORT}`)
+  );
 };
 
 Main();

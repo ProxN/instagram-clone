@@ -15,6 +15,7 @@ import crypto from 'crypto';
 import Post from '../post/post-entity';
 import Follow from '../follow/follow-entity';
 import Comment from '../comment/comment-entity';
+import Message from '../message/message-entity';
 
 @ObjectType()
 @Entity()
@@ -65,6 +66,9 @@ class User extends BaseEntity {
 
   @OneToMany(() => Comment, (comment) => comment.user_id)
   comments!: Comment[];
+
+  @OneToMany(() => Message, (message) => message.user_id)
+  messages!: Message[];
 
   @Field(() => String)
   @CreateDateColumn()

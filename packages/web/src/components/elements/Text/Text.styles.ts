@@ -22,6 +22,14 @@ import styled, {
   TextDecorationProps,
   cursor,
   CursorProps,
+  whiteSpace,
+  WhiteSpaceProps,
+  textOverflow,
+  TextOverflowProps,
+  MaxWidthProps,
+  maxWidth,
+  OverflowProps,
+  overflow,
 } from '@xstyled/styled-components';
 import { mode } from '@lib/utility/component';
 
@@ -35,7 +43,11 @@ const TextSystem = compose(
   opacity,
   display,
   textDecoration,
-  cursor
+  cursor,
+  textOverflow,
+  whiteSpace,
+  maxWidth,
+  overflow
 );
 
 export interface TextBaseProps
@@ -48,7 +60,11 @@ export interface TextBaseProps
     OpacityProps,
     DisplayProps,
     CursorProps,
-    TextDecorationProps {
+    TextDecorationProps,
+    TextOverflowProps,
+    WhiteSpaceProps,
+    MaxWidthProps,
+    OverflowProps {
   /** color from theme.colors */
   color?: string;
 

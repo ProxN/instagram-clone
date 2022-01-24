@@ -1,0 +1,12 @@
+query GetUserInbox {
+  getUserInbox {
+    id
+    text
+    createdAt
+    user {
+      id
+      username
+      avatar
+    }
+  }
+}

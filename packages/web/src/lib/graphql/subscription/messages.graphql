@@ -1,0 +1,7 @@
+subscription Messages {
+  messages {
+    id
+    text
+    text
+  }
+}

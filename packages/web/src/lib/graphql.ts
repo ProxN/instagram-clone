@@ -98,9 +98,37 @@ export type ForgotPassResponse = {
   error?: Maybe<FieldError>;
 };
 
+export type InboxResult = {
+  __typename?: 'InboxResult';
+  createdAt: Scalars['String'];
+  id: Scalars['String'];
+  receiver_id: Scalars['String'];
+  text: Scalars['String'];
+  time?: Maybe<Scalars['String']>;
+  user?: Maybe<User>;
+  user_id: Scalars['String'];
+};
+
 export type LoginInputs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+export type Message = {
+  __typename?: 'Message';
+  createdAt: Scalars['String'];
+  id: Scalars['ID'];
+  seen: Scalars['Boolean'];
+  text: Scalars['String'];
+  updatedAt: Scalars['String'];
+  user?: Maybe<User>;
+  user_id: Scalars['String'];
+};
+
+export type MessageResponse = {
+  __typename?: 'MessageResponse';
+  hasMore: Scalars['Boolean'];
+  messages: Array<InboxResult>;
 };
 
 export type Mutation = {
@@ -113,6 +141,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   newComment: NewCommentResponse;
   resetPassword: UserResponse;
+  sendMessage: SendMessageResponse;
   signin: UserResponse;
   signup: UserResponse;
   unFollow: FollowResponse;
@@ -149,6 +178,11 @@ export type MutationNewCommentArgs = {
 export type MutationResetPasswordArgs = {
   newPassword: Scalars['String'];
   resetToken: Scalars['String'];
+};
+
+export type MutationSendMessageArgs = {
+  receiver_id: Scalars['String'];
+  text: Scalars['String'];
 };
 
 export type MutationSigninArgs = {
@@ -211,10 +245,12 @@ export type Query = {
   __typename?: 'Query';
   followerSuggestion: FollowSuggestionResponse;
   getComments: CommentsResponse;
-  getPost: Post;
+  getPost?: Maybe<Post>;
   getPosts: PostsResponse;
+  getUserConversation: MessageResponse;
   getUserFollowers?: Maybe<Array<User>>;
   getUserFollowing?: Maybe<Array<User>>;
+  getUserInbox: Array<InboxResult>;
   getUserProfile?: Maybe<User>;
   me?: Maybe<User>;
   userFeeds: PostsResponse;
@@ -241,6 +277,12 @@ export type QueryGetPostsArgs = {
   user_id: Scalars['String'];
 };
 
+export type QueryGetUserConversationArgs = {
+  cursor?: InputMaybe<Scalars['String']>;
+  limit: Scalars['Int'];
+  receiver_id: Scalars['String'];
+};
+
 export type QueryGetUserFollowersArgs = {
   user_id: Scalars['String'];
 };
@@ -258,6 +300,12 @@ export type QueryUserFeedsArgs = {
   limit: Scalars['Int'];
 };
 
+export type SendMessageResponse = {
+  __typename?: 'SendMessageResponse';
+  error?: Maybe<FieldError>;
+  message?: Maybe<Message>;
+};
+
 export type SignupInputs = {
   email: Scalars['String'];
   name: Scalars['String'];
@@ -270,6 +318,11 @@ export type StatsResponse = {
   followers?: Maybe<Scalars['Float']>;
   following?: Maybe<Scalars['Float']>;
   posts?: Maybe<Scalars['Float']>;
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  messages: Message;
 };
 
 export type UpdatePassResponse = {
@@ -735,22 +788,25 @@ export type GetPostQueryVariables = Exact<{
 
 export type GetPostQuery = {
   __typename?: 'Query';
-  getPost: {
-    __typename?: 'Post';
-    id: string;
-    post_url: string;
-    caption?: string | null | undefined;
-    is_liked: boolean;
-    createdAt: string;
-    likes: number;
-    user: {
-      __typename?: 'User';
-      id: string;
-      username: string;
-      has_followed?: boolean | null | undefined;
-      avatar?: string | null | undefined;
-    };
-  };
+  getPost?:
+    | {
+        __typename?: 'Post';
+        id: string;
+        post_url: string;
+        caption?: string | null | undefined;
+        is_liked: boolean;
+        createdAt: string;
+        likes: number;
+        user: {
+          __typename?: 'User';
+          id: string;
+          username: string;
+          has_followed?: boolean | null | undefined;
+          avatar?: string | null | undefined;
+        };
+      }
+    | null
+    | undefined;
 };
 
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
@@ -770,6 +826,33 @@ export type MeQuery = {
       }
     | null
     | undefined;
+};
+
+export type GetUserConversationQueryVariables = Exact<{
+  receiver_id: Scalars['String'];
+  limit: Scalars['Int'];
+  cursor?: InputMaybe<Scalars['String']>;
+}>;
+
+export type GetUserConversationQuery = {
+  __typename?: 'Query';
+  getUserConversation: {
+    __typename?: 'MessageResponse';
+    hasMore: boolean;
+    messages: Array<{
+      __typename?: 'InboxResult';
+      id: string;
+      text: string;
+      createdAt: string;
+      user_id: string;
+      time?: string | null | undefined;
+      receiver_id: string;
+      user?:
+        | { __typename?: 'User'; id: string; username: string }
+        | null
+        | undefined;
+    }>;
+  };
 };
 
 export type UserFeedsQueryVariables = Exact<{
@@ -840,6 +923,27 @@ export type GetUserFollowingQuery = {
     | undefined;
 };
 
+export type GetUserInboxQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetUserInboxQuery = {
+  __typename?: 'Query';
+  getUserInbox: Array<{
+    __typename?: 'InboxResult';
+    id: string;
+    text: string;
+    createdAt: string;
+    user?:
+      | {
+          __typename?: 'User';
+          id: string;
+          username: string;
+          avatar?: string | null | undefined;
+        }
+      | null
+      | undefined;
+  }>;
+};
+
 export type GetUserPostsQueryVariables = Exact<{
   user_id: Scalars['String'];
   limit: Scalars['Int'];
@@ -888,6 +992,13 @@ export type GetUserProfileQuery = {
       }
     | null
     | undefined;
+};
+
+export type MessagesSubscriptionVariables = Exact<{ [key: string]: never }>;
+
+export type MessagesSubscription = {
+  __typename?: 'Subscription';
+  messages: { __typename?: 'Message'; id: string; text: string };
 };
 
 export const ErrorFragmentDoc = `
@@ -1806,6 +1917,81 @@ useMeQuery.fetcher = (
   variables?: MeQueryVariables,
   headers?: RequestInit['headers']
 ) => fetcher<MeQuery, MeQueryVariables>(client, MeDocument, variables, headers);
+export const GetUserConversationDocument = `
+    query GetUserConversation($receiver_id: String!, $limit: Int!, $cursor: String) {
+  getUserConversation(receiver_id: $receiver_id, limit: $limit, cursor: $cursor) {
+    messages {
+      id
+      text
+      createdAt
+      user_id
+      time
+      receiver_id
+      user {
+        id
+        username
+      }
+    }
+    hasMore
+  }
+}
+    `;
+export const useGetUserConversationQuery = <
+  TData = GetUserConversationQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables: GetUserConversationQueryVariables,
+  options?: UseQueryOptions<GetUserConversationQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetUserConversationQuery, TError, TData>(
+    ['GetUserConversation', variables],
+    fetcher<GetUserConversationQuery, GetUserConversationQueryVariables>(
+      client,
+      GetUserConversationDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetUserConversationQuery.getKey = (
+  variables: GetUserConversationQueryVariables
+) => ['GetUserConversation', variables];
+export const useInfiniteGetUserConversationQuery = <
+  TData = GetUserConversationQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof GetUserConversationQueryVariables,
+  client: GraphQLClient,
+  variables: GetUserConversationQueryVariables,
+  options?: UseInfiniteQueryOptions<GetUserConversationQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<GetUserConversationQuery, TError, TData>(
+    ['GetUserConversation.infinite', variables],
+    (metaData) =>
+      fetcher<GetUserConversationQuery, GetUserConversationQueryVariables>(
+        client,
+        GetUserConversationDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useGetUserConversationQuery.fetcher = (
+  client: GraphQLClient,
+  variables: GetUserConversationQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetUserConversationQuery, GetUserConversationQueryVariables>(
+    client,
+    GetUserConversationDocument,
+    variables,
+    headers
+  );
 export const UserFeedsDocument = `
     query UserFeeds($cursor: String, $limit: Int!) {
   userFeeds(cursor: $cursor, limit: $limit) {
@@ -2016,6 +2202,77 @@ useGetUserFollowingQuery.fetcher = (
     variables,
     headers
   );
+export const GetUserInboxDocument = `
+    query GetUserInbox {
+  getUserInbox {
+    id
+    text
+    createdAt
+    user {
+      id
+      username
+      avatar
+    }
+  }
+}
+    `;
+export const useGetUserInboxQuery = <
+  TData = GetUserInboxQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables?: GetUserInboxQueryVariables,
+  options?: UseQueryOptions<GetUserInboxQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetUserInboxQuery, TError, TData>(
+    variables === undefined ? ['GetUserInbox'] : ['GetUserInbox', variables],
+    fetcher<GetUserInboxQuery, GetUserInboxQueryVariables>(
+      client,
+      GetUserInboxDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetUserInboxQuery.getKey = (variables?: GetUserInboxQueryVariables) =>
+  variables === undefined ? ['GetUserInbox'] : ['GetUserInbox', variables];
+export const useInfiniteGetUserInboxQuery = <
+  TData = GetUserInboxQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof GetUserInboxQueryVariables,
+  client: GraphQLClient,
+  variables?: GetUserInboxQueryVariables,
+  options?: UseInfiniteQueryOptions<GetUserInboxQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<GetUserInboxQuery, TError, TData>(
+    variables === undefined
+      ? ['GetUserInbox.infinite']
+      : ['GetUserInbox.infinite', variables],
+    (metaData) =>
+      fetcher<GetUserInboxQuery, GetUserInboxQueryVariables>(
+        client,
+        GetUserInboxDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useGetUserInboxQuery.fetcher = (
+  client: GraphQLClient,
+  variables?: GetUserInboxQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetUserInboxQuery, GetUserInboxQueryVariables>(
+    client,
+    GetUserInboxDocument,
+    variables,
+    headers
+  );
 export const GetUserPostsDocument = `
     query GetUserPosts($user_id: String!, $limit: Int!, $cursor: String) {
   getPosts(user_id: $user_id, limit: $limit, cursor: $cursor) {
@@ -2163,3 +2420,12 @@ useGetUserProfileQuery.fetcher = (
     variables,
     headers
   );
+export const MessagesDocument = `
+    subscription Messages {
+  messages {
+    id
+    text
+    text
+  }
+}
+    `;

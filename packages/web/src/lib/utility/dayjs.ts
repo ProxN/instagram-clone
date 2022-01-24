@@ -1,6 +1,9 @@
 import relativeTime from 'dayjs/plugin/relativeTime';
+import LocalizedFormat from 'dayjs/plugin/localizedFormat';
+
 import enlocale from 'dayjs/locale/en';
 import dayjs from 'dayjs';
+dayjs.extend(LocalizedFormat);
 
 dayjs.extend(relativeTime);
 
