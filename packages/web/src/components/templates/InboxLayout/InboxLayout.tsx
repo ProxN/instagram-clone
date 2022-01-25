@@ -14,7 +14,11 @@ import { useQueryClient } from 'react-query';
 
 const InboxLayout: React.FC = ({ children }) => {
   const queryClient = useQueryClient();
-  const { data, isLoading, isFetching } = useGetUserInboxQuery(client);
+  const { data, isLoading, isFetching } = useGetUserInboxQuery(
+    client,
+    undefined,
+    { refetchOnWindowFocus: true }
+  );
 
   const currentUser = queryClient.getQueryData<MeQuery>(useMeQuery.getKey());
   return (

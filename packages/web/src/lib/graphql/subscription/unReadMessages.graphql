@@ -1,0 +1,6 @@
+subscription UnReadMessages {
+  unReadMessages {
+    user_id
+    count
+  }
+}

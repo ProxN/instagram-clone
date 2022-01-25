@@ -28,7 +28,7 @@ const AppLayout: React.FC = ({ children }) => {
       {user?.me && (
         <Header avatar={user.me.avatar} username={user.me.username} />
       )}
-      <Box as='main' h='calc(100vh - 6rem)' backgroundColor='gray.0'>
+      <Box as='main' minH='calc(100vh - 6rem)' backgroundColor='gray.0'>
         {children}
       </Box>
       {/* Create new Post */}

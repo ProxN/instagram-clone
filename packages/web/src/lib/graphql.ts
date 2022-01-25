@@ -254,6 +254,7 @@ export type Query = {
   getComments: CommentsResponse;
   getPost?: Maybe<Post>;
   getPosts: PostsResponse;
+  getUnreadMessagesCount: Array<UnReadMressagesResponse>;
   getUserConversation: MessageResponse;
   getUserFollowers?: Maybe<Array<User>>;
   getUserFollowing?: Maybe<Array<User>>;
@@ -330,6 +331,13 @@ export type StatsResponse = {
 export type Subscription = {
   __typename?: 'Subscription';
   messages: InboxResult;
+  unReadMessages: UnReadMressagesResponse;
+};
+
+export type UnReadMressagesResponse = {
+  __typename?: 'UnReadMressagesResponse';
+  count: Scalars['Float'];
+  user_id: Scalars['String'];
 };
 
 export type UpdatePassResponse = {
@@ -846,6 +854,19 @@ export type GetPostQuery = {
     | undefined;
 };
 
+export type GetUnreadMessagesCountQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetUnreadMessagesCountQuery = {
+  __typename?: 'Query';
+  getUnreadMessagesCount: Array<{
+    __typename?: 'UnReadMressagesResponse';
+    user_id: string;
+    count: number;
+  }>;
+};
+
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = {
@@ -1056,6 +1077,19 @@ export type MessagesSubscription = {
         }
       | null
       | undefined;
+  };
+};
+
+export type UnReadMessagesSubscriptionVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type UnReadMessagesSubscription = {
+  __typename?: 'Subscription';
+  unReadMessages: {
+    __typename?: 'UnReadMressagesResponse';
+    user_id: string;
+    count: number;
   };
 };
 
@@ -2023,6 +2057,80 @@ useGetPostQuery.fetcher = (
     variables,
     headers
   );
+export const GetUnreadMessagesCountDocument = `
+    query GetUnreadMessagesCount {
+  getUnreadMessagesCount {
+    user_id
+    count
+  }
+}
+    `;
+export const useGetUnreadMessagesCountQuery = <
+  TData = GetUnreadMessagesCountQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables?: GetUnreadMessagesCountQueryVariables,
+  options?: UseQueryOptions<GetUnreadMessagesCountQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetUnreadMessagesCountQuery, TError, TData>(
+    variables === undefined
+      ? ['GetUnreadMessagesCount']
+      : ['GetUnreadMessagesCount', variables],
+    fetcher<GetUnreadMessagesCountQuery, GetUnreadMessagesCountQueryVariables>(
+      client,
+      GetUnreadMessagesCountDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetUnreadMessagesCountQuery.getKey = (
+  variables?: GetUnreadMessagesCountQueryVariables
+) =>
+  variables === undefined
+    ? ['GetUnreadMessagesCount']
+    : ['GetUnreadMessagesCount', variables];
+export const useInfiniteGetUnreadMessagesCountQuery = <
+  TData = GetUnreadMessagesCountQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof GetUnreadMessagesCountQueryVariables,
+  client: GraphQLClient,
+  variables?: GetUnreadMessagesCountQueryVariables,
+  options?: UseInfiniteQueryOptions<GetUnreadMessagesCountQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<GetUnreadMessagesCountQuery, TError, TData>(
+    variables === undefined
+      ? ['GetUnreadMessagesCount.infinite']
+      : ['GetUnreadMessagesCount.infinite', variables],
+    (metaData) =>
+      fetcher<
+        GetUnreadMessagesCountQuery,
+        GetUnreadMessagesCountQueryVariables
+      >(
+        client,
+        GetUnreadMessagesCountDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useGetUnreadMessagesCountQuery.fetcher = (
+  client: GraphQLClient,
+  variables?: GetUnreadMessagesCountQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetUnreadMessagesCountQuery, GetUnreadMessagesCountQueryVariables>(
+    client,
+    GetUnreadMessagesCountDocument,
+    variables,
+    headers
+  );
 export const MeDocument = `
     query Me {
   me {
@@ -2589,6 +2697,14 @@ export const MessagesDocument = `
       username
       avatar
     }
+  }
+}
+    `;
+export const UnReadMessagesDocument = `
+    subscription UnReadMessages {
+  unReadMessages {
+    user_id
+    count
   }
 }
     `;

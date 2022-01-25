@@ -3,11 +3,9 @@ import {
   Arg,
   Authorized,
   Ctx,
-  Field,
   FieldResolver,
   Int,
   Mutation,
-  ObjectType,
   Query,
   Resolver,
   Root,
@@ -20,19 +18,13 @@ import { Context } from '../../types/context';
 import {
   InboxResult,
   MessageResponse,
+  MessagesPayload,
   SendMessageResponse,
+  UnReadMressagesResponse,
 } from '../../types/message';
 import Conversation from '../conversation/conversation-entity';
 import User from '../user/user-entity';
 import Message from './message-entity';
-
-@ObjectType()
-class TestingArgs {
-  @Field(() => Conversation)
-  conversation!: Conversation;
-  @Field(() => Message)
-  message!: InboxResult;
-}
 
 @Resolver(InboxResult)
 class MessageResolver {
@@ -77,6 +69,7 @@ class MessageResolver {
       }).save();
 
       pubSub.publish('READ_MESSAGE', { message, conversation });
+      pubSub.publish('UNREAD_MESSAGES', conversation);
     } catch (error) {
       return {
         error: {
@@ -150,6 +143,24 @@ class MessageResolver {
   }
 
   @Authorized()
+  @Query(() => [UnReadMressagesResponse])
+  async getUnreadMessagesCount(@Ctx() { req }: Context) {
+    const result = await getConnection().query(
+      `
+      select m."user_id", count(m."id")
+      from message m
+      inner join conversation c ON c."message_id" = m."id"
+      where c."receiver_id" = $1
+      and m."seen"  = false
+      group by m."user_id"
+      `,
+      [req.session.userId]
+    );
+
+    return result;
+  }
+
+  @Authorized()
   @Mutation(() => Boolean)
   async seenMessages(
     @Arg('user_id') user_id: string,
@@ -175,7 +186,7 @@ class MessageResolver {
       payload,
       context,
     }: {
-      payload: TestingArgs;
+      payload: MessagesPayload;
       context: { req: Request };
     }) => {
       const { conversation } = payload;
@@ -188,7 +199,7 @@ class MessageResolver {
       return false;
     },
   })
-  async messages(@Root() payload: TestingArgs): Promise<InboxResult> {
+  async messages(@Root() payload: MessagesPayload): Promise<InboxResult> {
     const time = dayjs(payload.message.createdAt)
       .minute(0)
       .second(0)
@@ -198,6 +209,28 @@ class MessageResolver {
       ...payload.message,
       receiver_id: payload.conversation.receiver_id,
       time: new Date(time),
+    };
+  }
+
+  @Subscription(() => UnReadMressagesResponse, {
+    topics: 'UNREAD_MESSAGES',
+    filter: ({
+      payload,
+      context,
+    }: {
+      payload: Conversation;
+      context: { req: Request };
+    }) => {
+      if (context.req.session.userId === payload.receiver_id) {
+        return true;
+      }
+      return false;
+    },
+  })
+  async unReadMessages(@Root() payload: Conversation) {
+    return {
+      user_id: payload.user_id,
+      count: 1,
     };
   }
 }

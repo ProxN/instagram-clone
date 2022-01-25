@@ -14,6 +14,7 @@ import { Flex } from '@components/layout/Flex';
 import { Loader } from '@components/elements/Loader';
 import {
   MeQuery,
+  useGetUnreadMessagesCountQuery,
   useGetUserInboxQuery,
   useInfiniteGetUserConversationQuery,
   useMeQuery,
@@ -86,6 +87,7 @@ const ChatBox: React.FC<{ user_id: string }> = ({ user_id }) => {
     onSuccess: (data) => {
       if (data.seenMessages) {
         queryClient.invalidateQueries(useGetUserInboxQuery.getKey());
+        queryClient.invalidateQueries(useGetUnreadMessagesCountQuery.getKey());
       }
     },
   });

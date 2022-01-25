@@ -12,6 +12,9 @@ import { IconButton } from '@components/elements/IconButton';
 import { Avatar } from '@components/elements/Avatar';
 import { Text } from '@components/elements/Text';
 import { useLogout } from '@lib/hooks/useLogout';
+import { useGetUnreadMessagesCountQuery } from '@lib/graphql';
+import { client } from '@lib/utility/graphqlClient';
+import { useUnreadMessages } from '@lib/hooks/useUnReadMessages';
 
 interface HeaderProps {
   avatar?: string | null;
@@ -36,6 +39,10 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const router = useRouter();
   const { handleLogout } = useLogout();
+  const { data } = useGetUnreadMessagesCountQuery(client, undefined, {
+    refetchOnWindowFocus: true,
+  });
+  useUnreadMessages();
 
   useEffect(() => {
     const handleRouteChange = () => {
@@ -124,13 +131,32 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
               </NextLink>
               <NextLink href='/home/inbox'>
                 <li>
-                  <IconButton
-                    size='sm'
-                    ariaLabel='home link'
-                    color='blackAlpha'
-                    variant='link'
-                    icon={<Icon name='paper-plane' />}
-                  />
+                  <Box position='relative'>
+                    <IconButton
+                      size='sm'
+                      ariaLabel='home link'
+                      color='blackAlpha'
+                      variant='link'
+                      icon={<Icon name='paper-plane' />}
+                    />
+                    {data && data.getUnreadMessagesCount.length > 0 ? (
+                      <Flex
+                        position='absolute'
+                        w='1.8rem'
+                        h='1.8rem'
+                        backgroundColor='red.6'
+                        fontSize='sm'
+                        justifyContent='center'
+                        color='#fff'
+                        borderRadius='50%'
+                        alignItems='center'
+                        right='-.8rem'
+                        top='-.8rem'
+                      >
+                        {data.getUnreadMessagesCount.length}
+                      </Flex>
+                    ) : null}
+                  </Box>
                 </li>
               </NextLink>
               <NextLink

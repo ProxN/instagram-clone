@@ -1,0 +1,6 @@
+query GetUnreadMessagesCount {
+  getUnreadMessagesCount {
+    user_id
+    count
+  }
+}

@@ -44,3 +44,12 @@ export class MessageResponse {
   @Field()
   hasMore!: boolean;
 }
+
+@ObjectType()
+export class UnReadMressagesResponse {
+  @Field()
+  user_id!: string;
+
+  @Field()
+  count!: number;
+}
