@@ -11,7 +11,7 @@ const Inbox = () => {
   const router = useRouter();
 
   return (
-    <Box as='section' h='100%' p='2rem 0'>
+    <Box as='section' h='calc(100vh - 6rem)' p='2rem 0'>
       <InboxLayout>
         {!router.query.userId ? (
           <Flex

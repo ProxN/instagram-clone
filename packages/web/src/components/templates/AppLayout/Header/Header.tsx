@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
   const router = useRouter();
   const { handleLogout } = useLogout();
   const { data } = useGetUnreadMessagesCountQuery(client, undefined, {
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   });
   useUnreadMessages();
 

@@ -164,7 +164,7 @@ class PostResolver {
 
     const result = await getConnection().query(
       `
-      select p.* 
+      select DISTINCT p."id", p.* 
       from post p
       inner join public.user u ON u."id" = p."user_id"
       left join follow f ON f."follower_id" = p."user_id"

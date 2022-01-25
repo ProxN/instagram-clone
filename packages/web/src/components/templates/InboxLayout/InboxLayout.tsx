@@ -44,7 +44,7 @@ const InboxLayout: React.FC = ({ children }) => {
           borderColor='blackAlpha.3'
         >
           <Text fontWeight='semibold' size='md'>
-            ayo.23923
+            {currentUser?.me?.username}
           </Text>
           <Box
             cursor='pointer'
@@ -87,7 +87,7 @@ const InboxLayout: React.FC = ({ children }) => {
             <>
               {data?.getUserInbox.map((el) => (
                 <NextLink
-                  href={`/home/inbox?userId=${el.user?.id}`}
+                  href={`/home/inbox?userId=${el.user?.id}&username=${el.user?.username}`}
                   as={`/home/inbox/${el.id}`}
                   key={el.id}
                 >

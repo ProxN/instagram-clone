@@ -26,6 +26,7 @@ import { groupMessages } from '@lib/utility/groupBy';
 import { client } from '@lib/utility/graphqlClient';
 import { useInterSectionObserver } from '@lib/hooks/useInterSectionObserver';
 import { useMessagesSubscription } from '@lib/hooks/useMessagesSubscription';
+import { useRouter } from 'next/router';
 
 const SendMessageSchema = yup
   .object({
@@ -47,6 +48,7 @@ const formateMessageDate = (date: number) => {
 
 const ChatBox: React.FC<{ user_id: string }> = ({ user_id }) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   useMessagesSubscription(user_id);
   const { control, handleSubmit, formState } = useForm<{ text: string }>({
     resolver: yupResolver(SendMessageSchema),
@@ -147,7 +149,7 @@ const ChatBox: React.FC<{ user_id: string }> = ({ user_id }) => {
       >
         <Avatar size='sm' src='/default.jpg' />
         <Text fontWeight='semibold' ml={2}>
-          Test5349w5
+          {router.query.username}
         </Text>
       </Flex>
       {(isFetchingNextPage || isLoading) && (
