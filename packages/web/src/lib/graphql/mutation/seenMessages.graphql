@@ -1,0 +1,3 @@
+mutation SeenMessages($user_id: String!, $lastMessageDate: String!) {
+  seenMessages(user_id: $user_id, lastMessageDate: $lastMessageDate)
+}

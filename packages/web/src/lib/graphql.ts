@@ -103,6 +103,7 @@ export type InboxResult = {
   createdAt: Scalars['String'];
   id: Scalars['String'];
   receiver_id: Scalars['String'];
+  seen?: Maybe<Scalars['Boolean']>;
   text: Scalars['String'];
   time?: Maybe<Scalars['String']>;
   user?: Maybe<User>;
@@ -141,6 +142,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   newComment: NewCommentResponse;
   resetPassword: UserResponse;
+  seenMessages: Scalars['Boolean'];
   sendMessage: SendMessageResponse;
   signin: UserResponse;
   signup: UserResponse;
@@ -178,6 +180,11 @@ export type MutationNewCommentArgs = {
 export type MutationResetPasswordArgs = {
   newPassword: Scalars['String'];
   resetToken: Scalars['String'];
+};
+
+export type MutationSeenMessagesArgs = {
+  lastMessageDate: Scalars['String'];
+  user_id: Scalars['String'];
 };
 
 export type MutationSendMessageArgs = {
@@ -322,7 +329,7 @@ export type StatsResponse = {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  messages: Message;
+  messages: InboxResult;
 };
 
 export type UpdatePassResponse = {
@@ -612,6 +619,36 @@ export type ResetPasswordMutation = {
   };
 };
 
+export type SeenMessagesMutationVariables = Exact<{
+  user_id: Scalars['String'];
+  lastMessageDate: Scalars['String'];
+}>;
+
+export type SeenMessagesMutation = {
+  __typename?: 'Mutation';
+  seenMessages: boolean;
+};
+
+export type SendMessageMutationVariables = Exact<{
+  text: Scalars['String'];
+  receiver_id: Scalars['String'];
+}>;
+
+export type SendMessageMutation = {
+  __typename?: 'Mutation';
+  sendMessage: {
+    __typename?: 'SendMessageResponse';
+    message?:
+      | { __typename?: 'Message'; id: string; text: string; createdAt: string }
+      | null
+      | undefined;
+    error?:
+      | { __typename?: 'FieldError'; field: string; message: string }
+      | null
+      | undefined;
+  };
+};
+
 export type SignupMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
@@ -847,6 +884,7 @@ export type GetUserConversationQuery = {
       user_id: string;
       time?: string | null | undefined;
       receiver_id: string;
+      seen?: boolean | null | undefined;
       user?:
         | { __typename?: 'User'; id: string; username: string }
         | null
@@ -932,6 +970,8 @@ export type GetUserInboxQuery = {
     id: string;
     text: string;
     createdAt: string;
+    seen?: boolean | null | undefined;
+    user_id: string;
     user?:
       | {
           __typename?: 'User';
@@ -998,7 +1038,25 @@ export type MessagesSubscriptionVariables = Exact<{ [key: string]: never }>;
 
 export type MessagesSubscription = {
   __typename?: 'Subscription';
-  messages: { __typename?: 'Message'; id: string; text: string };
+  messages: {
+    __typename?: 'InboxResult';
+    id: string;
+    text: string;
+    user_id: string;
+    time?: string | null | undefined;
+    seen?: boolean | null | undefined;
+    receiver_id: string;
+    createdAt: string;
+    user?:
+      | {
+          __typename?: 'User';
+          id: string;
+          username: string;
+          avatar?: string | null | undefined;
+        }
+      | null
+      | undefined;
+  };
 };
 
 export const ErrorFragmentDoc = `
@@ -1442,6 +1500,99 @@ useResetPasswordMutation.fetcher = (
   fetcher<ResetPasswordMutation, ResetPasswordMutationVariables>(
     client,
     ResetPasswordDocument,
+    variables,
+    headers
+  );
+export const SeenMessagesDocument = `
+    mutation SeenMessages($user_id: String!, $lastMessageDate: String!) {
+  seenMessages(user_id: $user_id, lastMessageDate: $lastMessageDate)
+}
+    `;
+export const useSeenMessagesMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    SeenMessagesMutation,
+    TError,
+    SeenMessagesMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    SeenMessagesMutation,
+    TError,
+    SeenMessagesMutationVariables,
+    TContext
+  >(
+    'SeenMessages',
+    (variables?: SeenMessagesMutationVariables) =>
+      fetcher<SeenMessagesMutation, SeenMessagesMutationVariables>(
+        client,
+        SeenMessagesDocument,
+        variables,
+        headers
+      )(),
+    options
+  );
+useSeenMessagesMutation.fetcher = (
+  client: GraphQLClient,
+  variables: SeenMessagesMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<SeenMessagesMutation, SeenMessagesMutationVariables>(
+    client,
+    SeenMessagesDocument,
+    variables,
+    headers
+  );
+export const SendMessageDocument = `
+    mutation SendMessage($text: String!, $receiver_id: String!) {
+  sendMessage(text: $text, receiver_id: $receiver_id) {
+    message {
+      id
+      text
+      createdAt
+    }
+    error {
+      ...Error
+    }
+  }
+}
+    ${ErrorFragmentDoc}`;
+export const useSendMessageMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    SendMessageMutation,
+    TError,
+    SendMessageMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    SendMessageMutation,
+    TError,
+    SendMessageMutationVariables,
+    TContext
+  >(
+    'SendMessage',
+    (variables?: SendMessageMutationVariables) =>
+      fetcher<SendMessageMutation, SendMessageMutationVariables>(
+        client,
+        SendMessageDocument,
+        variables,
+        headers
+      )(),
+    options
+  );
+useSendMessageMutation.fetcher = (
+  client: GraphQLClient,
+  variables: SendMessageMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<SendMessageMutation, SendMessageMutationVariables>(
+    client,
+    SendMessageDocument,
     variables,
     headers
   );
@@ -1927,6 +2078,7 @@ export const GetUserConversationDocument = `
       user_id
       time
       receiver_id
+      seen
       user {
         id
         username
@@ -2208,6 +2360,8 @@ export const GetUserInboxDocument = `
     id
     text
     createdAt
+    seen
+    user_id
     user {
       id
       username
@@ -2425,7 +2579,16 @@ export const MessagesDocument = `
   messages {
     id
     text
-    text
+    user_id
+    time
+    seen
+    receiver_id
+    createdAt
+    user {
+      id
+      username
+      avatar
+    }
   }
 }
     `;

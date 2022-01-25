@@ -23,6 +23,9 @@ export class InboxResult {
   @Field(() => User, { nullable: true })
   user!: User;
 
+  @Field(() => Boolean, { nullable: true })
+  seen?: boolean;
+
   @Field()
   receiver_id!: string;
 

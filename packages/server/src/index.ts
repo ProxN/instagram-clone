@@ -6,10 +6,7 @@ import express from 'express';
 import session from 'express-session';
 import { execute, subscribe } from 'graphql';
 import { createServer } from 'http';
-import {
-  ConnectionContext,
-  SubscriptionServer,
-} from 'subscriptions-transport-ws';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { PubSub } from 'graphql-subscriptions';
 
 import { buildSchema } from 'type-graphql';
@@ -126,25 +123,16 @@ const Main = async () => {
       schema,
       execute,
       subscribe,
-      onConnect: async (
-        connectionParams: Record<string, unknown>,
-        ws: any,
-        ctx: ConnectionContext
-      ) => {
+      onConnect: async (connectionParams: Record<string, unknown>, ws: any) => {
         return new Promise((resolve) => {
-          const req = ctx.request as express.Request;
-          const res = {} as any as express.Response;
-          sessionMiddleware(req, res, () => {
-            const userId = req.session && req.session.userId;
-            resolve({ userId });
+          sessionMiddleware(ws.upgradeReq, {} as any, () => {
+            resolve({ req: ws.upgradeReq, userLoader: createUserLoader() });
           });
         });
       },
     },
     { server: httpServer, path: apolloServer.graphqlPath }
   );
-
-  await apolloServer.start();
 
   app.get(
     '/graphql',
@@ -153,6 +141,8 @@ const Main = async () => {
       subscriptionEndpoint: `/graphql`,
     })
   );
+
+  await apolloServer.start();
   apolloServer.applyMiddleware({ app, cors: false });
 
   httpServer.listen(PORT, () =>

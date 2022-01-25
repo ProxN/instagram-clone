@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import {
   Arg,
   Authorized,
@@ -12,6 +13,7 @@ import {
   Root,
   Subscription,
 } from 'type-graphql';
+import dayjs from 'dayjs';
 import { getConnection } from 'typeorm';
 import { checkEmpty } from '../../lib/helpers';
 import { Context } from '../../types/context';
@@ -29,7 +31,7 @@ class TestingArgs {
   @Field(() => Conversation)
   conversation!: Conversation;
   @Field(() => Message)
-  message!: Message;
+  message!: InboxResult;
 }
 
 @Resolver(InboxResult)
@@ -73,6 +75,7 @@ class MessageResolver {
         message_id: message.id,
         receiver_id,
       }).save();
+
       pubSub.publish('READ_MESSAGE', { message, conversation });
     } catch (error) {
       return {
@@ -132,11 +135,11 @@ class MessageResolver {
       select DISTINCT ON (pair) conv.*, case 
       when conv."user_id" = $1
       then (conv."user_id",conv."receiver_id") else (conv."receiver_id",conv."user_id") end as pair
-      from ( select  c."user_id", c."receiver_id", m."text", m."id", m."createdAt"
+      from ( select  c."user_id", c."receiver_id", m."text", m."id", m."createdAt", m."seen"
       from message m
       inner join conversation c on c."message_id" = m."id"
       where $1 in (c."user_id", c."receiver_id")
-      group by c."user_id", c."receiver_id", m."text",  m."id", m."createdAt"
+      group by c."user_id", c."receiver_id", m."text",  m."id", m."createdAt", m."seen"
       order by c."receiver_id", c."user_id"
       ) conv
       order by pair, conv."createdAt" DESC
@@ -146,27 +149,56 @@ class MessageResolver {
     return result;
   }
 
-  @Subscription(() => Message, {
+  @Authorized()
+  @Mutation(() => Boolean)
+  async seenMessages(
+    @Arg('user_id') user_id: string,
+    @Arg('lastMessageDate') lastMessageDate: string,
+    @Ctx() { req }: Context
+  ) {
+    const messageDate = new Date(+lastMessageDate + 1000 * 60);
+    await getConnection().query(
+      `
+      update message m
+      set seen = true
+      from conversation c
+      where m."createdAt" <= $3 AND (m."id",c."receiver_id",c."user_id") = (c."message_id",$1,$2)
+      `,
+      [req.session.userId, user_id, messageDate]
+    );
+    return true;
+  }
+
+  @Subscription(() => InboxResult, {
     topics: 'READ_MESSAGE',
     filter: ({
       payload,
       context,
     }: {
       payload: TestingArgs;
-      context: { userId: string };
+      context: { req: Request };
     }) => {
       const { conversation } = payload;
-      const { userId } = context;
+      const { userId } = context.req.session;
       if (
-        conversation.receiver_id === userId ||
-        conversation.user_id === userId
+        conversation.user_id === userId ||
+        conversation.receiver_id === userId
       )
         return true;
       return false;
     },
   })
-  async messages(@Root() payload: TestingArgs) {
-    return payload.message;
+  async messages(@Root() payload: TestingArgs): Promise<InboxResult> {
+    const time = dayjs(payload.message.createdAt)
+      .minute(0)
+      .second(0)
+      .millisecond(0)
+      .format();
+    return {
+      ...payload.message,
+      receiver_id: payload.conversation.receiver_id,
+      time: new Date(time),
+    };
   }
 }
 

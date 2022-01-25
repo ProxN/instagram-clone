@@ -7,13 +7,16 @@ import { Loader } from '@components/elements/Loader';
 import { Text } from '@components/elements/Text';
 import { Box } from '@components/layout/Box';
 import { Flex } from '@components/layout/Flex';
-import { useGetUserInboxQuery } from '@lib/graphql';
+import { MeQuery, useGetUserInboxQuery, useMeQuery } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { dayjs } from '@lib/utility/dayjs';
+import { useQueryClient } from 'react-query';
 
 const InboxLayout: React.FC = ({ children }) => {
+  const queryClient = useQueryClient();
   const { data, isLoading, isFetching } = useGetUserInboxQuery(client);
 
+  const currentUser = queryClient.getQueryData<MeQuery>(useMeQuery.getKey());
   return (
     <Box
       h='100%'
@@ -80,8 +83,8 @@ const InboxLayout: React.FC = ({ children }) => {
             <>
               {data?.getUserInbox.map((el) => (
                 <NextLink
-                  href={`/inbox?userId=${el.user?.id}`}
-                  as={`/inbox/${el.id}`}
+                  href={`/home/inbox?userId=${el.user?.id}`}
+                  as={`/home/inbox/${el.id}`}
                   key={el.id}
                 >
                   <Box
@@ -94,14 +97,23 @@ const InboxLayout: React.FC = ({ children }) => {
                   >
                     <Avatar size='lg' src={el.user?.avatar || '/default.jpg'} />
                     <Flex ml={3} flexDirection='column' flex={1}>
-                      <Text fontWeight='semibold'>{el.user?.username}</Text>
+                      <Text>{el.user?.username}</Text>
                       <Box overflow='hidden' display='flex'>
                         <Text
-                          color='gray'
+                          color={
+                            el.seen || el.user_id === currentUser?.me?.id
+                              ? 'gray'
+                              : '#000'
+                          }
                           maxW='65%'
                           overflow='hidden'
                           textOverflow='ellipsis'
                           whiteSpace='nowrap'
+                          fontWeight={
+                            el.seen || el.user_id === currentUser?.me?.id
+                              ? 'normal'
+                              : 'semibold'
+                          }
                         >
                           {el.text}
                         </Text>

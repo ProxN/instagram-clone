@@ -3,6 +3,8 @@ query GetUserInbox {
     id
     text
     createdAt
+    seen
+    user_id
     user {
       id
       username

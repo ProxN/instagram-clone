@@ -122,7 +122,7 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
                   />
                 </li>
               </NextLink>
-              <NextLink href='/inbox'>
+              <NextLink href='/home/inbox'>
                 <li>
                   <IconButton
                     size='sm'

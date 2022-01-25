@@ -2,6 +2,15 @@ subscription Messages {
   messages {
     id
     text
-    text
+    user_id
+    time
+    seen
+    receiver_id
+    createdAt
+    user {
+      id
+      username
+      avatar
+    }
   }
 }
