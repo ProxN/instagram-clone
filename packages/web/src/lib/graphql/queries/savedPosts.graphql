@@ -1,0 +1,11 @@
+query GetSavedPosts {
+  getSavedPosts {
+    id
+    post_url
+    caption
+    likes
+    comments
+    createdAt
+    has_bookmark
+  }
+}

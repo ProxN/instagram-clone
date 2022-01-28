@@ -1,0 +1,3 @@
+mutation BookmarkPost($post_id: String!) {
+  bookmarkPost(post_id: $post_id)
+}

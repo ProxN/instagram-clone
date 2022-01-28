@@ -38,6 +38,7 @@ interface PostCardProps {
   createdAt: string;
   likes: number;
   is_liked?: boolean;
+  has_bookmark?: boolean | null;
   user: {
     id: string;
     username: string;
@@ -70,6 +71,7 @@ const PostCard: React.FC<PostCardProps> = (props) => {
     is_liked,
     createdAt,
     likes,
+    has_bookmark,
     hasMoreComments,
     fetchMoreComments,
     hideGoToPostLink,
@@ -232,6 +234,8 @@ const PostCard: React.FC<PostCardProps> = (props) => {
             borderColor={{ md: 'blackAlpha.2' }}
           >
             <CardFooter
+              id={post_id}
+              has_bookmark={has_bookmark}
               likes={likes}
               data={data}
               is_liked={is_liked}

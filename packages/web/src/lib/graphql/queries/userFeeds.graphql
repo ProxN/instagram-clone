@@ -9,6 +9,7 @@ query UserFeeds($cursor: String, $limit: Int!) {
       comments
       createdAt
       is_liked
+      has_bookmark
       user {
         id
         username

@@ -1,4 +1,3 @@
-import { Field, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
   CreateDateColumn,
@@ -8,26 +7,28 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Field, ID, ObjectType } from 'type-graphql';
 import User from '../user/user-entity';
+import Post from '../post/post-entity';
 
 @ObjectType()
 @Entity()
-class Follow extends BaseEntity {
-  @Field()
+class Bookmark extends BaseEntity {
+  @Field(() => ID)
   @PrimaryColumn()
   user_id!: string;
 
-  @Field()
+  @Field(() => ID)
   @PrimaryColumn()
-  follower_id!: string;
+  post_id!: string;
 
-  @ManyToOne(() => User, (user) => user.followers, { primary: true })
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
-  user?: User;
+  user!: User;
 
-  @ManyToOne(() => User, (user) => user.following, { primary: true })
-  @JoinColumn({ name: 'follower_id' })
-  follower?: User;
+  @ManyToOne(() => Post)
+  @JoinColumn({ name: 'post_id' })
+  post!: Post;
 
   @Field(() => String)
   @CreateDateColumn({ type: 'timestamptz' })
@@ -38,4 +39,4 @@ class Follow extends BaseEntity {
   updatedAt?: Date;
 }
 
-export default Follow;
+export default Bookmark;

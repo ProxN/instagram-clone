@@ -26,9 +26,14 @@ import { UserPosts } from '@components/templates/UserPosts';
 import { FollowersModal } from '@components/templates/FollowersModal';
 import FollowingModal from '@components/templates/FollowingModal/FollowingModal';
 import { UnFollowModal } from '@components/elements/UnFollowModal';
+import { useState } from 'react';
+import { SavedPosts } from '@components/templates/SavedPosts';
+
+type Tabs = 'posts' | 'saved';
 
 const Profile = ({ username }: { username: string }) => {
   const router = useRouter();
+  const [currentTab, setCurrentTab] = useState<Tabs>('posts');
   const queryClient = useQueryClient();
   const { onOpen, onClose, isOpen } = useDisclosure();
   const {
@@ -93,6 +98,10 @@ const Profile = ({ username }: { username: string }) => {
   const unFollowHandler = () => {
     if (!data.getUserProfile?.id) return;
     unFollowMutation({ follower_id: data.getUserProfile.id });
+  };
+
+  const handleTabClick = (tab: Tabs) => {
+    setCurrentTab(tab);
   };
 
   return (
@@ -211,7 +220,10 @@ const Profile = ({ username }: { username: string }) => {
                         {data?.getUserProfile?.stats.followers}
                       </Text>
                       <Text size={{ xs: 'sm', md: 'md' }} as='span'>
-                        &nbsp;Follower
+                        &nbsp;
+                        {data && (data.getUserProfile.stats.followers || 0) > 1
+                          ? 'Followers'
+                          : 'Follower'}
                       </Text>
                     </Box>
                   </NextLink>
@@ -337,8 +349,13 @@ const Profile = ({ username }: { username: string }) => {
               cursor='pointer'
               alignItems='center'
               mr={{ md: '4rem' }}
-              borderTop={{ xs: 'none', md: '2px solid transparent' }}
+              borderTop={{
+                xs: 'none',
+                md: currentTab === 'posts' ? '2px solid transparent' : 'none',
+              }}
               borderColor={{ md: 'blackAlpha.7' }}
+              onClick={() => handleTabClick('posts')}
+              color={currentTab === 'posts' ? 'inherit' : 'gray.6'}
             >
               <Box
                 fontSize={{ xs: '2.4rem', md: '1.2rem' }}
@@ -360,7 +377,13 @@ const Profile = ({ username }: { username: string }) => {
               cursor='pointer'
               alignItems='center'
               mr={{ md: '4rem' }}
-              color='gray.6'
+              color={currentTab === 'saved' ? 'inherit' : 'gray.6'}
+              borderTop={{
+                xs: 'none',
+                md: currentTab === 'saved' ? '2px solid transparent' : 'none',
+              }}
+              borderColor={{ md: 'blackAlpha.7' }}
+              onClick={() => handleTabClick('saved')}
             >
               <Box
                 fontSize={{ xs: '2.4rem', md: '1.2rem' }}
@@ -373,7 +396,7 @@ const Profile = ({ username }: { username: string }) => {
                 fontWeight='semibold'
                 textTransform='uppercase'
               >
-                Bookmark
+                saved
               </Text>
             </Flex>
             <Flex
@@ -399,7 +422,13 @@ const Profile = ({ username }: { username: string }) => {
             </Flex>
           </Flex>
           {/* Profile Posts */}
-          <UserPosts user_id={data.getUserProfile.id} />
+          {currentTab === 'posts' ? (
+            <UserPosts user_id={data.getUserProfile.id} />
+          ) : currentTab === 'saved' ? (
+            <SavedPosts />
+          ) : (
+            'hasTgas'
+          )}
         </Box>
       </Box>
       {/* Modal */}

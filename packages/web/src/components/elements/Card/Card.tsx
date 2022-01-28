@@ -34,6 +34,7 @@ interface CardProps {
     comments: number;
     is_liked: boolean;
     caption?: string | null;
+    has_bookmark?: boolean | null;
   };
   user: {
     id: string;
@@ -160,6 +161,8 @@ const Card: React.FC<CardProps> = ({ post, user }) => {
         </Box>
         <Box p='1.2rem 1.5rem'>
           <CardFooter
+            id={post.id}
+            has_bookmark={post.has_bookmark}
             handleFocusComment={handleFocusInput}
             is_liked={post.is_liked}
             likes={post.likes}

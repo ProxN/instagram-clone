@@ -52,6 +52,7 @@ const PostModal = () => {
             fetchMoreComments={fetchNextPage}
             createdAt={data.getPost.createdAt}
             comments={comments}
+            has_bookmark={data.getPost.has_bookmark}
             likes={data.getPost.likes}
             post_id={data.getPost.id}
             is_liked={data.getPost.is_liked}

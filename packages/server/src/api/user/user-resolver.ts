@@ -179,6 +179,22 @@ class UserResolver {
     const user = await User.findOne({ where: { username } });
     return user;
   }
+
+  @Authorized()
+  @Query(() => [User], { nullable: true })
+  async searchUsers(@Arg('query') query: string) {
+    if (!query) return [];
+    const users = await getConnection()
+      .getRepository(User)
+      .createQueryBuilder('u')
+      .select()
+      .where(`u."username" like :query`, { query: `%${query}%` })
+      .orWhere(`u."name" like :query`, { query: `%${query}%` })
+      .limit(10)
+      .getMany();
+
+    return users;
+  }
 }
 
 export default UserResolver;

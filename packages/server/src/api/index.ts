@@ -5,13 +5,15 @@ import commentEntity from './comment/comment-entity';
 import likeEntity from './like/like-entity';
 import messageEntity from './message/message-entity';
 import conversationEntity from './conversation/conversation-entity';
+import bookmarkEntity from './bookmark/bookmark-entity';
 import authResolver from './auth/auth-resolver';
 import userResolver from './user/user-resolver';
 import postResolver from './post/post-resolver';
 import followResolver from './follow/follow-resolver';
 import commentResolver from './comment/comment-resolver';
 import likeResolver from './like/like-resolver';
-import MessageResolver from './message/message-resolver';
+import messageResolver from './message/message-resolver';
+import bookMarkResolver from './bookmark/bookmark-resolver';
 
 export const entities = [
   userEntity,
@@ -21,6 +23,7 @@ export const entities = [
   likeEntity,
   messageEntity,
   conversationEntity,
+  bookmarkEntity,
 ];
 export const resolvers = [
   authResolver,
@@ -29,5 +32,6 @@ export const resolvers = [
   followResolver,
   commentResolver,
   likeResolver,
-  MessageResolver,
+  messageResolver,
+  bookMarkResolver,
 ] as const;

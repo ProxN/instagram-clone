@@ -1,0 +1,9 @@
+query SearchUsers($query: String!) {
+  searchUsers(query: $query) {
+    id
+    username
+    name
+    avatar
+    createdAt
+  }
+}

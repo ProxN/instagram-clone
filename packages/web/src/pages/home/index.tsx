@@ -95,7 +95,7 @@ const Home = () => {
             </Flex>
           ) : (
             <>
-              <Stories />
+              {/* <Stories /> */}
               <Feed data={data} />
             </>
           )}

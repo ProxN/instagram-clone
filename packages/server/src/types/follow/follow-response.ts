@@ -15,3 +15,9 @@ export class FollowSuggestionResponse {
   @Field(() => Boolean)
   hasMore!: boolean;
 }
+
+@ObjectType()
+export class NofiticationResponse extends User {
+  @Field(() => String)
+  since?: Date;
+}

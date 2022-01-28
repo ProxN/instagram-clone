@@ -50,7 +50,7 @@ const DeletePostModal: React.FC<DeletePostProps> = ({
           </Box>
           <Box>
             <Button onClick={onClose} fullWidth variant='ghost'>
-              Cancal
+              Cancel
             </Button>
           </Box>
         </ModalBody>

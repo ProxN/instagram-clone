@@ -9,7 +9,11 @@ import {
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { Context } from '../../types/context';
-import { FollowResponse, FollowSuggestionResponse } from '../../types/follow';
+import {
+  FollowResponse,
+  FollowSuggestionResponse,
+  NofiticationResponse,
+} from '../../types/follow';
 import User from '../user/user-entity';
 import Follow from './follow-entity';
 import * as followErrors from './follow-errors';
@@ -136,6 +140,23 @@ class FollowResolver {
       users: result.slice(0, followersLimit),
       hasMore: result.length === realLimit,
     };
+  }
+
+  @Authorized()
+  @Query(() => [NofiticationResponse])
+  async followersNotification(@Ctx() { req }: Context) {
+    const result = await getConnection().query(
+      `
+      select u.*, f."createdAt" as since from follow f
+      inner join public.user u on f."user_id" = u."id"
+      where f."follower_id" = $1
+      and date_trunc('month',f."createdAt") = date_trunc('month',NOW())
+      order by f."createdAt" DESC
+      limit 10
+    `,
+      [req.session.userId]
+    );
+    return result;
   }
 }
 

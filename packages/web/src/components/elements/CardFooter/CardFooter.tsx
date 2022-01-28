@@ -1,7 +1,13 @@
 import { Box } from '@components/layout/Box';
 import { Flex } from '@components/layout/Flex';
 import { Space } from '@components/layout/Space';
-import { LikePostMutation } from '@lib/graphql';
+import {
+  LikePostMutation,
+  useBookmarkPostMutation,
+  useUnBookmarkPostMutation,
+} from '@lib/graphql';
+import { client } from '@lib/utility/graphqlClient';
+import { useState } from 'react';
 import { Icon } from '../Icon';
 import { IconButton } from '../IconButton';
 import { Text } from '../Text';
@@ -9,6 +15,8 @@ import { Text } from '../Text';
 interface CardFooterProps {
   likes: number;
   is_liked?: boolean;
+  has_bookmark?: boolean | null;
+  id: string;
   data?: LikePostMutation;
   handleFocusComment?: () => void;
   handleLikeClick?: () => void;
@@ -18,9 +26,34 @@ const CardFooter: React.FC<CardFooterProps> = ({
   handleLikeClick,
   handleFocusComment,
   is_liked,
+  has_bookmark,
   data,
   likes,
+  id,
 }) => {
+  const [bookmark, setBookmark] = useState(has_bookmark);
+  const { mutate: bookmarkMutation } = useBookmarkPostMutation(client, {
+    onSuccess: (data) => {
+      if (data.bookmarkPost) {
+        setBookmark(true);
+      }
+    },
+  });
+  const { mutate: unBookmarkMutation } = useUnBookmarkPostMutation(client, {
+    onSuccess: (data) => {
+      if (data.unBookmarkPost) {
+        setBookmark(false);
+      }
+    },
+  });
+
+  const handleSaveClick = () => {
+    bookmarkMutation({ post_id: id });
+  };
+
+  const handleUnSaveClick = () => {
+    unBookmarkMutation({ post_id: id });
+  };
   return (
     <Box>
       <Flex>
@@ -49,9 +82,10 @@ const CardFooter: React.FC<CardFooterProps> = ({
           />
         </Space>
         <IconButton
+          onClick={bookmark ? handleUnSaveClick : handleSaveClick}
           ariaLabel='Bookmark'
           variant='ghost'
-          icon={<Icon name='bookmark' />}
+          icon={<Icon name={bookmark ? 'bookmark-sharp' : 'bookmark'} />}
         />
       </Flex>
       <Box mt={2}>

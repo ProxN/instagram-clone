@@ -135,6 +135,7 @@ export type MessageResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   addPost: AddPostResponse;
+  bookmarkPost: Scalars['Boolean'];
   deletePost: DeletePostResponse;
   follow: FollowResponse;
   forgotPassword: ForgotPassResponse;
@@ -146,6 +147,7 @@ export type Mutation = {
   sendMessage: SendMessageResponse;
   signin: UserResponse;
   signup: UserResponse;
+  unBookmarkPost: Scalars['Boolean'];
   unFollow: FollowResponse;
   updateAvatar: UserResponse;
   updatePassword: UpdatePassResponse;
@@ -155,6 +157,10 @@ export type Mutation = {
 export type MutationAddPostArgs = {
   data: AddPostInput;
   file: Scalars['Upload'];
+};
+
+export type MutationBookmarkPostArgs = {
+  post_id: Scalars['String'];
 };
 
 export type MutationDeletePostArgs = {
@@ -200,6 +206,10 @@ export type MutationSignupArgs = {
   data: SignupInputs;
 };
 
+export type MutationUnBookmarkPostArgs = {
+  post_id: Scalars['String'];
+};
+
 export type MutationUnFollowArgs = {
   follower_id: Scalars['String'];
 };
@@ -228,11 +238,30 @@ export type NewCommentResponse = {
   error?: Maybe<FieldError>;
 };
 
+export type NofiticationResponse = {
+  __typename?: 'NofiticationResponse';
+  avatar?: Maybe<Scalars['String']>;
+  bio?: Maybe<Scalars['String']>;
+  createdAt: Scalars['String'];
+  email: Scalars['String'];
+  has_avatar: Scalars['Boolean'];
+  has_followed?: Maybe<Scalars['Boolean']>;
+  id: Scalars['ID'];
+  name: Scalars['String'];
+  posts: Array<Post>;
+  since: Scalars['String'];
+  stats: StatsResponse;
+  updatedAt: Scalars['String'];
+  username: Scalars['String'];
+  website?: Maybe<Scalars['String']>;
+};
+
 export type Post = {
   __typename?: 'Post';
   caption?: Maybe<Scalars['String']>;
   comments: Scalars['Float'];
   createdAt: Scalars['String'];
+  has_bookmark?: Maybe<Scalars['Boolean']>;
   id: Scalars['ID'];
   is_liked: Scalars['Boolean'];
   likes: Scalars['Float'];
@@ -251,9 +280,11 @@ export type PostsResponse = {
 export type Query = {
   __typename?: 'Query';
   followerSuggestion: FollowSuggestionResponse;
+  followersNotification: Array<NofiticationResponse>;
   getComments: CommentsResponse;
   getPost?: Maybe<Post>;
   getPosts: PostsResponse;
+  getSavedPosts: Array<Post>;
   getUnreadMessagesCount: Array<UnReadMressagesResponse>;
   getUserConversation: MessageResponse;
   getUserFollowers?: Maybe<Array<User>>;
@@ -261,6 +292,7 @@ export type Query = {
   getUserInbox: Array<InboxResult>;
   getUserProfile?: Maybe<User>;
   me?: Maybe<User>;
+  searchUsers?: Maybe<Array<User>>;
   userFeeds: PostsResponse;
 };
 
@@ -301,6 +333,10 @@ export type QueryGetUserFollowingArgs = {
 
 export type QueryGetUserProfileArgs = {
   username: Scalars['String'];
+};
+
+export type QuerySearchUsersArgs = {
+  query: Scalars['String'];
 };
 
 export type QueryUserFeedsArgs = {
@@ -479,6 +515,15 @@ export type AddPostMutation = {
       | null
       | undefined;
   };
+};
+
+export type BookmarkPostMutationVariables = Exact<{
+  post_id: Scalars['String'];
+}>;
+
+export type BookmarkPostMutation = {
+  __typename?: 'Mutation';
+  bookmarkPost: boolean;
 };
 
 export type DeletePostMutationVariables = Exact<{
@@ -688,6 +733,15 @@ export type SignupMutation = {
   };
 };
 
+export type UnBookmarkPostMutationVariables = Exact<{
+  post_id: Scalars['String'];
+}>;
+
+export type UnBookmarkPostMutation = {
+  __typename?: 'Mutation';
+  unBookmarkPost: boolean;
+};
+
 export type UnFollowMutationVariables = Exact<{
   follower_id: Scalars['String'];
 }>;
@@ -802,6 +856,22 @@ export type FollowerSuggestionQuery = {
   };
 };
 
+export type FollowersNotificationQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type FollowersNotificationQuery = {
+  __typename?: 'Query';
+  followersNotification: Array<{
+    __typename?: 'NofiticationResponse';
+    id: string;
+    username: string;
+    name: string;
+    since: string;
+    has_followed?: boolean | null | undefined;
+  }>;
+};
+
 export type GetCommentsQueryVariables = Exact<{
   post_id: Scalars['String'];
   cursor?: InputMaybe<Scalars['String']>;
@@ -842,6 +912,7 @@ export type GetPostQuery = {
         is_liked: boolean;
         createdAt: string;
         likes: number;
+        has_bookmark?: boolean | null | undefined;
         user: {
           __typename?: 'User';
           id: string;
@@ -882,6 +953,41 @@ export type MeQuery = {
         website?: string | null | undefined;
         bio?: string | null | undefined;
       }
+    | null
+    | undefined;
+};
+
+export type GetSavedPostsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetSavedPostsQuery = {
+  __typename?: 'Query';
+  getSavedPosts: Array<{
+    __typename?: 'Post';
+    id: string;
+    post_url: string;
+    caption?: string | null | undefined;
+    likes: number;
+    comments: number;
+    createdAt: string;
+    has_bookmark?: boolean | null | undefined;
+  }>;
+};
+
+export type SearchUsersQueryVariables = Exact<{
+  query: Scalars['String'];
+}>;
+
+export type SearchUsersQuery = {
+  __typename?: 'Query';
+  searchUsers?:
+    | Array<{
+        __typename?: 'User';
+        id: string;
+        username: string;
+        name: string;
+        avatar?: string | null | undefined;
+        createdAt: string;
+      }>
     | null
     | undefined;
 };
@@ -933,6 +1039,7 @@ export type UserFeedsQuery = {
       comments: number;
       createdAt: string;
       is_liked: boolean;
+      has_bookmark?: boolean | null | undefined;
       user: {
         __typename?: 'User';
         id: string;
@@ -1024,6 +1131,7 @@ export type GetUserPostsQuery = {
       likes: number;
       comments: number;
       createdAt: string;
+      has_bookmark?: boolean | null | undefined;
     }>;
   };
 };
@@ -1186,6 +1294,48 @@ useAddPostMutation.fetcher = (
   fetcher<AddPostMutation, AddPostMutationVariables>(
     client,
     AddPostDocument,
+    variables,
+    headers
+  );
+export const BookmarkPostDocument = `
+    mutation BookmarkPost($post_id: String!) {
+  bookmarkPost(post_id: $post_id)
+}
+    `;
+export const useBookmarkPostMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    BookmarkPostMutation,
+    TError,
+    BookmarkPostMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    BookmarkPostMutation,
+    TError,
+    BookmarkPostMutationVariables,
+    TContext
+  >(
+    'BookmarkPost',
+    (variables?: BookmarkPostMutationVariables) =>
+      fetcher<BookmarkPostMutation, BookmarkPostMutationVariables>(
+        client,
+        BookmarkPostDocument,
+        variables,
+        headers
+      )(),
+    options
+  );
+useBookmarkPostMutation.fetcher = (
+  client: GraphQLClient,
+  variables: BookmarkPostMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<BookmarkPostMutation, BookmarkPostMutationVariables>(
+    client,
+    BookmarkPostDocument,
     variables,
     headers
   );
@@ -1671,6 +1821,48 @@ useSignupMutation.fetcher = (
     variables,
     headers
   );
+export const UnBookmarkPostDocument = `
+    mutation UnBookmarkPost($post_id: String!) {
+  unBookmarkPost(post_id: $post_id)
+}
+    `;
+export const useUnBookmarkPostMutation = <TError = unknown, TContext = unknown>(
+  client: GraphQLClient,
+  options?: UseMutationOptions<
+    UnBookmarkPostMutation,
+    TError,
+    UnBookmarkPostMutationVariables,
+    TContext
+  >,
+  headers?: RequestInit['headers']
+) =>
+  useMutation<
+    UnBookmarkPostMutation,
+    TError,
+    UnBookmarkPostMutationVariables,
+    TContext
+  >(
+    'UnBookmarkPost',
+    (variables?: UnBookmarkPostMutationVariables) =>
+      fetcher<UnBookmarkPostMutation, UnBookmarkPostMutationVariables>(
+        client,
+        UnBookmarkPostDocument,
+        variables,
+        headers
+      )(),
+    options
+  );
+useUnBookmarkPostMutation.fetcher = (
+  client: GraphQLClient,
+  variables: UnBookmarkPostMutationVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<UnBookmarkPostMutation, UnBookmarkPostMutationVariables>(
+    client,
+    UnBookmarkPostDocument,
+    variables,
+    headers
+  );
 export const UnFollowDocument = `
     mutation UnFollow($follower_id: String!) {
   unFollow(follower_id: $follower_id) {
@@ -1918,6 +2110,80 @@ useFollowerSuggestionQuery.fetcher = (
     variables,
     headers
   );
+export const FollowersNotificationDocument = `
+    query FollowersNotification {
+  followersNotification {
+    id
+    username
+    name
+    since
+    has_followed
+  }
+}
+    `;
+export const useFollowersNotificationQuery = <
+  TData = FollowersNotificationQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables?: FollowersNotificationQueryVariables,
+  options?: UseQueryOptions<FollowersNotificationQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<FollowersNotificationQuery, TError, TData>(
+    variables === undefined
+      ? ['FollowersNotification']
+      : ['FollowersNotification', variables],
+    fetcher<FollowersNotificationQuery, FollowersNotificationQueryVariables>(
+      client,
+      FollowersNotificationDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useFollowersNotificationQuery.getKey = (
+  variables?: FollowersNotificationQueryVariables
+) =>
+  variables === undefined
+    ? ['FollowersNotification']
+    : ['FollowersNotification', variables];
+export const useInfiniteFollowersNotificationQuery = <
+  TData = FollowersNotificationQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof FollowersNotificationQueryVariables,
+  client: GraphQLClient,
+  variables?: FollowersNotificationQueryVariables,
+  options?: UseInfiniteQueryOptions<FollowersNotificationQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<FollowersNotificationQuery, TError, TData>(
+    variables === undefined
+      ? ['FollowersNotification.infinite']
+      : ['FollowersNotification.infinite', variables],
+    (metaData) =>
+      fetcher<FollowersNotificationQuery, FollowersNotificationQueryVariables>(
+        client,
+        FollowersNotificationDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useFollowersNotificationQuery.fetcher = (
+  client: GraphQLClient,
+  variables?: FollowersNotificationQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<FollowersNotificationQuery, FollowersNotificationQueryVariables>(
+    client,
+    FollowersNotificationDocument,
+    variables,
+    headers
+  );
 export const GetCommentsDocument = `
     query GetComments($post_id: String!, $cursor: String, $limit: Int!) {
   getComments(post_id: $post_id, cursor: $cursor, limit: $limit) {
@@ -1997,6 +2263,7 @@ export const GetPostDocument = `
     is_liked
     createdAt
     likes
+    has_bookmark
     user {
       id
       username
@@ -2176,6 +2443,141 @@ useMeQuery.fetcher = (
   variables?: MeQueryVariables,
   headers?: RequestInit['headers']
 ) => fetcher<MeQuery, MeQueryVariables>(client, MeDocument, variables, headers);
+export const GetSavedPostsDocument = `
+    query GetSavedPosts {
+  getSavedPosts {
+    id
+    post_url
+    caption
+    likes
+    comments
+    createdAt
+    has_bookmark
+  }
+}
+    `;
+export const useGetSavedPostsQuery = <
+  TData = GetSavedPostsQuery,
+  TError = unknown
+>(
+  client: GraphQLClient,
+  variables?: GetSavedPostsQueryVariables,
+  options?: UseQueryOptions<GetSavedPostsQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<GetSavedPostsQuery, TError, TData>(
+    variables === undefined ? ['GetSavedPosts'] : ['GetSavedPosts', variables],
+    fetcher<GetSavedPostsQuery, GetSavedPostsQueryVariables>(
+      client,
+      GetSavedPostsDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useGetSavedPostsQuery.getKey = (variables?: GetSavedPostsQueryVariables) =>
+  variables === undefined ? ['GetSavedPosts'] : ['GetSavedPosts', variables];
+export const useInfiniteGetSavedPostsQuery = <
+  TData = GetSavedPostsQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof GetSavedPostsQueryVariables,
+  client: GraphQLClient,
+  variables?: GetSavedPostsQueryVariables,
+  options?: UseInfiniteQueryOptions<GetSavedPostsQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<GetSavedPostsQuery, TError, TData>(
+    variables === undefined
+      ? ['GetSavedPosts.infinite']
+      : ['GetSavedPosts.infinite', variables],
+    (metaData) =>
+      fetcher<GetSavedPostsQuery, GetSavedPostsQueryVariables>(
+        client,
+        GetSavedPostsDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useGetSavedPostsQuery.fetcher = (
+  client: GraphQLClient,
+  variables?: GetSavedPostsQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<GetSavedPostsQuery, GetSavedPostsQueryVariables>(
+    client,
+    GetSavedPostsDocument,
+    variables,
+    headers
+  );
+export const SearchUsersDocument = `
+    query SearchUsers($query: String!) {
+  searchUsers(query: $query) {
+    id
+    username
+    name
+    avatar
+    createdAt
+  }
+}
+    `;
+export const useSearchUsersQuery = <TData = SearchUsersQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables: SearchUsersQueryVariables,
+  options?: UseQueryOptions<SearchUsersQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<SearchUsersQuery, TError, TData>(
+    ['SearchUsers', variables],
+    fetcher<SearchUsersQuery, SearchUsersQueryVariables>(
+      client,
+      SearchUsersDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useSearchUsersQuery.getKey = (variables: SearchUsersQueryVariables) => [
+  'SearchUsers',
+  variables,
+];
+export const useInfiniteSearchUsersQuery = <
+  TData = SearchUsersQuery,
+  TError = unknown
+>(
+  pageParamKey: keyof SearchUsersQueryVariables,
+  client: GraphQLClient,
+  variables: SearchUsersQueryVariables,
+  options?: UseInfiniteQueryOptions<SearchUsersQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<SearchUsersQuery, TError, TData>(
+    ['SearchUsers.infinite', variables],
+    (metaData) =>
+      fetcher<SearchUsersQuery, SearchUsersQueryVariables>(
+        client,
+        SearchUsersDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useSearchUsersQuery.fetcher = (
+  client: GraphQLClient,
+  variables: SearchUsersQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<SearchUsersQuery, SearchUsersQueryVariables>(
+    client,
+    SearchUsersDocument,
+    variables,
+    headers
+  );
 export const GetUserConversationDocument = `
     query GetUserConversation($receiver_id: String!, $limit: Int!, $cursor: String) {
   getUserConversation(receiver_id: $receiver_id, limit: $limit, cursor: $cursor) {
@@ -2264,6 +2666,7 @@ export const UserFeedsDocument = `
       comments
       createdAt
       is_liked
+      has_bookmark
       user {
         id
         username
@@ -2545,6 +2948,7 @@ export const GetUserPostsDocument = `
       likes
       comments
       createdAt
+      has_bookmark
     }
     hasMore
   }

@@ -11,7 +11,7 @@ interface FeedProps {
 
 const Feed: React.FC<FeedProps> = ({ data }) => {
   return (
-    <Box mt={{ sm: '2rem' }}>
+    <Box>
       <Box display='grid' gridTemplateColumns='1fr' rowGap={{ xs: 3, sm: 4 }}>
         {data?.pages.map((page, i) => (
           <Fragment key={i}>

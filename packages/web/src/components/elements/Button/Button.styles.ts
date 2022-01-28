@@ -198,6 +198,7 @@ export const LinkButton = styled(BaseButton)<BaseButtonProps>`
       background-color: transparent;
       color: ${mode(`${color}.7`, `${color}.2`)(theme.colorMode)};
       border-color: transparent;
+      text-decoration: none;
 
       &:not(:disabled):hover {
         text-decoration: underline;

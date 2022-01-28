@@ -51,7 +51,7 @@ const SettingsModal: React.FC<SettingsModal> = ({ isOpen, onClose }) => {
           textAlign='center'
           padding='1rem 0rem'
         >
-          Cancal
+          Cancel
         </Box>
       </ModalContent>
     </Modal>

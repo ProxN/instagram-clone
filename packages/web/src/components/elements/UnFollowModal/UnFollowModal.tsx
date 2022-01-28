@@ -52,7 +52,7 @@ const UnFollowModal: React.FC<UnFollowModalProps> = ({
             </Box>
             <Box borderTop='1px solid' borderColor='blackAlpha.3'>
               <Button onClick={onClose} fullWidth variant='ghost'>
-                Cancal
+                Cancel
               </Button>
             </Box>
           </Box>

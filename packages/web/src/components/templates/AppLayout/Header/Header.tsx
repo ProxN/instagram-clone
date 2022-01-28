@@ -11,6 +11,7 @@ import { Space } from '@components/layout/Space';
 import { IconButton } from '@components/elements/IconButton';
 import { Avatar } from '@components/elements/Avatar';
 import { Text } from '@components/elements/Text';
+import { Notification } from '@components/templates/Notification';
 import { useLogout } from '@lib/hooks/useLogout';
 import { useGetUnreadMessagesCountQuery } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
@@ -125,7 +126,13 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
                     ariaLabel='home link'
                     color='blackAlpha'
                     variant='link'
-                    icon={<Icon name='home' />}
+                    icon={
+                      <Icon
+                        name={
+                          router.pathname === '/home' ? 'home-sharp' : 'home'
+                        }
+                      />
+                    }
                   />
                 </li>
               </NextLink>
@@ -137,7 +144,15 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
                       ariaLabel='home link'
                       color='blackAlpha'
                       variant='link'
-                      icon={<Icon name='paper-plane' />}
+                      icon={
+                        <Icon
+                          name={
+                            router.pathname.includes('inbox')
+                              ? 'paper-plane-sharp'
+                              : 'paper-plane'
+                          }
+                        />
+                      }
                     />
                     {data && data.getUnreadMessagesCount.length > 0 ? (
                       <Flex
@@ -187,7 +202,8 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
                   />
                 </li>
               </NextLink>
-              <li>
+              <Notification />
+              {/* <li>
                 <IconButton
                   size='sm'
                   ariaLabel='home link'
@@ -195,7 +211,7 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
                   variant='link'
                   icon={<Icon name='heart' />}
                 />
-              </li>
+              </li> */}
             </Space>
           </Box>
 
@@ -285,7 +301,7 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
             >
               <div>
                 <Avatar
-                  src={avatar}
+                  src={avatar || '/default.jpg'}
                   onClick={() => setShowAvatarMenu(!showAvatarMenu)}
                 />
               </div>

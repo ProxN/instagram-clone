@@ -1,0 +1,9 @@
+query FollowersNotification {
+  followersNotification {
+    id
+    username
+    name
+    since
+    has_followed
+  }
+}

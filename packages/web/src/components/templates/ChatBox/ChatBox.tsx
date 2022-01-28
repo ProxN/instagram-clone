@@ -50,13 +50,15 @@ const ChatBox: React.FC<{ user_id: string }> = ({ user_id }) => {
   const queryClient = useQueryClient();
   const router = useRouter();
   useMessagesSubscription(user_id);
-  const { control, handleSubmit, formState } = useForm<{ text: string }>({
-    resolver: yupResolver(SendMessageSchema),
-    mode: 'onChange',
-    defaultValues: {
-      text: '',
-    },
-  });
+  const { control, handleSubmit, formState, reset } = useForm<{ text: string }>(
+    {
+      resolver: yupResolver(SendMessageSchema),
+      mode: 'onChange',
+      defaultValues: {
+        text: '',
+      },
+    }
+  );
   const { mutate, isLoading: sendMessageLoading } =
     useSendMessageMutation(client);
   const {
@@ -135,6 +137,7 @@ const ChatBox: React.FC<{ user_id: string }> = ({ user_id }) => {
       receiver_id: user_id,
       text: values.text,
     });
+    reset();
   };
 
   return (

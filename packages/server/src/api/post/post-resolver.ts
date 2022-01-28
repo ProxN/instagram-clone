@@ -19,6 +19,7 @@ import {
   DeletePostResponse,
   PostsResponse,
 } from '../../types/post';
+import Bookmark from '../bookmark/bookmark-entity';
 import Like from '../like/like-entity';
 import User from '../user/user-entity';
 import Post from './post-entity';
@@ -29,6 +30,15 @@ class PostResolver {
   @FieldResolver(() => User)
   async user(@Root() post: Post) {
     return User.findOne(post.user_id);
+  }
+
+  @FieldResolver(() => Boolean, { nullable: true })
+  async has_bookmark(@Root() post: Post, @Ctx() { req }: Context) {
+    const result = await Bookmark.findOne({
+      where: { user_id: req.session.userId, post_id: post.id },
+    });
+
+    return !!result;
   }
 
   @Authorized()

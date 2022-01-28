@@ -85,7 +85,7 @@ const PostOption: React.FC<PostOptionProps> = ({
           </Box>
           <Box>
             <Button onClick={onClose} fullWidth variant='ghost'>
-              Cancal
+              Cancel
             </Button>
           </Box>
         </ModalBody>

@@ -1,4 +1,6 @@
 import NextLink from 'next/link';
+import { useQueryClient } from 'react-query';
+import { useRouter } from 'next/router';
 import { Avatar } from '@components/elements/Avatar';
 import { FollowLoader } from '@components/elements/FollowLoader';
 import { Icon } from '@components/elements/Icon';
@@ -10,9 +12,9 @@ import { Flex } from '@components/layout/Flex';
 import { MeQuery, useGetUserInboxQuery, useMeQuery } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { dayjs } from '@lib/utility/dayjs';
-import { useQueryClient } from 'react-query';
 
 const InboxLayout: React.FC = ({ children }) => {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { data, isLoading, isFetching } = useGetUserInboxQuery(
     client,
@@ -33,7 +35,12 @@ const InboxLayout: React.FC = ({ children }) => {
       gridTemplateColumns={{ xs: '1fr', md: '35% 1fr' }}
     >
       {/* Aside  */}
-      <Box borderRight='1px solid' borderColor='blackAlpha.3' overflow='hidden'>
+      <Box
+        borderRight='1px solid'
+        borderColor='blackAlpha.3'
+        overflow='hidden'
+        display={{ xs: router.query.userId ? 'none' : 'unset' }}
+      >
         {/* Aside header */}
         <Flex
           h='6rem'
