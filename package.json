@@ -3,11 +3,15 @@
   "private": true,
   "version": "1.0.0",
   "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "start:server": "cd packages/server && npm run start",
     "build:server": "cd packages/server && npm run build",
     "lint": "lerna run lint",
     "typecheck": "lerna run typecheck",
+    "prettier":"lerna run prettier",
     "prepare": "husky install"
   },
   "devDependencies": {

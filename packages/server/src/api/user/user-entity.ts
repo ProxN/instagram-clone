@@ -18,7 +18,7 @@ import Comment from '../comment/comment-entity';
 import Message from '../message/message-entity';
 
 @ObjectType()
-@Entity()
+@Entity({ schema: 'public', name: 'User' })
 class User extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')

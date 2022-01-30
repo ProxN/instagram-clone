@@ -10,7 +10,7 @@ const connectDB = async () => {
     type: 'postgres',
     entities,
     logging: !IS_PROD,
-    synchronize: true,
+    // synchronize: !IS_PROD,
     port: 5432,
     host: DB_HOST,
     database: DB_NAME,
