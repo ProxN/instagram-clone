@@ -7,14 +7,14 @@
     "start:dev": "nodemon",
     "start": "node build/src/index.js",
     "build": "rimraf ./build && tsc",
-    "typeorm:cli": "ts-node ./node_modules/typeorm/cli -f ormconfig.ts",
+    "typeorm:cli": "ts-node --project tsconfig.json ./node_modules/typeorm/cli -f ormconfig.ts",
     "typecheck": "tsc --noEmit",
     "drop-db": "ts-node ./src/lib/test-setup.ts",
     "lint": "eslint --cache --ext .ts src",
     "lint:fix": "eslint --fix --cache --ext .ts src",
     "prettier": "prettier --write src",
     "pre-commit": "npx lint-staged",
-    "test": "npm run drop-db && mocha -r ts-node/register src/api/**/*.test.ts  --timeout 100000 --recursive --exit"
+    "test": "pnpm run drop-db && mocha -r ts-node/register src/api/**/*.test.ts  --timeout 100000 --recursive --exit"
   },
   "lint-staged": {
     "*.{js,ts}": [

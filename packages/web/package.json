@@ -43,11 +43,11 @@
     "eslint-plugin-react": "7.27.1"
   },
   "dependencies": {
-    "@hookform/resolvers": "^2.8.3",
+    "@hookform/resolvers": "2.8.3",
     "@sentry/nextjs": "^6.15.0",
     "@svgr/webpack": "^5.5.0",
     "@types/react-dom": "^17.0.11",
-    "@xstyled/styled-components": "^3.1.2",
+    "@xstyled/styled-components": "3.1.2",
     "color": "^4.0.1",
     "dayjs": "^1.10.7",
     "framer-motion": "^5.5.5",
@@ -62,7 +62,12 @@
     "react-hot-toast": "^2.1.1",
     "react-query": "^3.33.4",
     "react-tiny-popover": "^7.0.1",
-    "styled-components": "^5.3.3",
+    "styled-components": "5.3.3",
     "yup": "^0.32.11"
+  },
+  "resolutions": {
+    "@xstyled/core": "3.1.2",
+    "@xstyled/system": "3.1.2",
+    "@xstyled/util": "3.1.0"
   }
 }

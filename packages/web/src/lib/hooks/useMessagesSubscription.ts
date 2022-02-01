@@ -6,7 +6,9 @@ import {
   useGetUserInboxQuery,
 } from '@lib/graphql';
 
-const url = 'ws://localhost:5000/graphql';
+const endpoint = process.env.API_URL as string;
+
+const url = `ws://${endpoint}/graphql`;
 
 export const useMessagesSubscription = (receiver_id: string) => {
   const queryClient = useQueryClient();

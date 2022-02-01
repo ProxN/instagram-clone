@@ -5,10 +5,11 @@
   "license": "MIT",
   "workspaces": [
     "packages/*"
+
   ],
   "scripts": {
-    "start:server": "cd packages/server && npm run start",
-    "build:server": "cd packages/server && npm run build",
+    "start:server": "cd packages/server && pnpm run start",
+    "build:server": "cd packages/server && pnpm run build",
     "lint": "lerna run lint",
     "typecheck": "lerna run typecheck",
     "prettier":"lerna run prettier",
