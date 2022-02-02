@@ -66,8 +66,6 @@
     "yup": "^0.32.11"
   },
   "resolutions": {
-    "@xstyled/core": "3.1.2",
-    "@xstyled/system": "3.1.2",
-    "@xstyled/util": "3.1.0"
+    "@xstyled/core": "3.1.2"
   }
 }

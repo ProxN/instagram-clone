@@ -55,6 +55,7 @@ jobs:
             echo $PATH
             cd /home/ubuntu/instagram-clone
             rm -rf packages/web
-            pnpm install
+            yarn
             cd packages/server
-            pnpm run build
+            yarn build
+

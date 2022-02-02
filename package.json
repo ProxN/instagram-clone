@@ -4,18 +4,19 @@
   "version": "1.0.0",
   "license": "MIT",
   "engines": {
-    "node": ">=10",
-    "pnpm": ">=3"
+    "node": ">=10"
   },
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/**"
+    ]
+  },
   "scripts": {
-    "start:server": "cd packages/server && pnpm run start",
-    "build:server": "cd packages/server && pnpm run build",
+    "start:server": "cd packages/server && yarn start",
+    "build:server": "cd packages/server && yarn build",
     "lint": "lerna run lint",
     "typecheck": "lerna run typecheck",
-    "prettier":"lerna run prettier",
+    "prettier": "lerna run prettier",
     "prepare": "husky install"
   },
   "devDependencies": {
@@ -34,7 +35,6 @@
     "rimraf": "3.0.2",
     "typescript": "4.5.2"
   },
-  "dependencies": {},
   "resolutions": {
     "@xstyled/core": "3.1.2",
     "@xstyled/system": "3.1.2",

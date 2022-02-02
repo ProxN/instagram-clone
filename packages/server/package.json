@@ -14,7 +14,7 @@
     "lint:fix": "eslint --fix --cache --ext .ts src",
     "prettier": "prettier --write src",
     "pre-commit": "npx lint-staged",
-    "test": "pnpm run drop-db && mocha -r ts-node/register src/api/**/*.test.ts  --timeout 100000 --recursive --exit"
+    "test": "yarn run drop-db && mocha -r ts-node/register src/api/**/*.test.ts  --timeout 100000 --recursive --exit"
   },
   "lint-staged": {
     "*.{js,ts}": [
