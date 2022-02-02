@@ -6,7 +6,6 @@ import {
 } from '@lib/graphql';
 
 const endpoint = process.env.API_URL as string;
-
 const url = `ws://${endpoint}/graphql`;
 
 export const useUnreadMessages = () => {

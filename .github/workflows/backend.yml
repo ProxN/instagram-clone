@@ -56,4 +56,4 @@ jobs:
             yarn install --production=false
             cd packages/server
             yarn build
-
+            pm2 restart app1
