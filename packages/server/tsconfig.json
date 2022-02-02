@@ -15,7 +15,7 @@
       "resolveJsonModule": true /* Include modules imported with '.json' extension */,
       "skipLibCheck": true /* Skip type checking of declaration files. */,
       "esModuleInterop": true,
-      "typeRoots": ["@types", "./node_modules/@types"],
+      "typeRoots": ["@types", "../../node_modules/@types"],
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
     },

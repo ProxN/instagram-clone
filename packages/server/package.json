@@ -35,6 +35,7 @@
     "@types/graphql-depth-limit": "1.1.3",
     "@types/graphql-upload": "^8.0.8",
     "@types/html-to-text": "8.0.1",
+    "@types/jest": "^27.4.0",
     "@types/mocha": "9.0.0",
     "@types/node": "16.11.11",
     "@types/nodemailer": "6.4.4",
