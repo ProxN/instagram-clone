@@ -2,8 +2,8 @@ import { createConnection } from 'typeorm';
 import path from 'path';
 import * as Sentry from '@sentry/node';
 import { entities } from './api';
-import { DB_HOST, DB_NAME, DB_PASS, DB_USER, IS_PROD } from './lib/config';
 import { logger } from './lib/logger';
+import { DB_HOST, DB_NAME, DB_PASS, DB_USER, IS_PROD } from './lib/config';
 
 const connectDB = async () => {
   await createConnection({
