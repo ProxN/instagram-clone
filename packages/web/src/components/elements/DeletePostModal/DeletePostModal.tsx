@@ -1,6 +1,5 @@
 import { Box } from '@components/layout/Box';
 import { Flex } from '@components/layout/Flex';
-import { SettingsModal } from '@components/templates/SettingsModal';
 import { Button } from '../Button';
 import { Modal, ModalBody, ModalContent, ModalOverylay } from '../Modal';
 import { Text } from '../Text';

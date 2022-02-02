@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import { Box } from '@components/layout/Box';
 import { Feed } from '@components/templates/Feed';
 import { PostModal } from '@components/elements/PostModal';
-import Stories from '@components/templates/Stories/Stories';
 import { Suggestions } from '@components/elements/Suggestions';
 import {
   useInfiniteFollowerSuggestionQuery,

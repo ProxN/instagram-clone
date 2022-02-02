@@ -3,9 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "license": "MIT",
+  "engines": {
+    "node": ">=10",
+    "pnpm": ">=3"
+  },
   "workspaces": [
     "packages/*"
-
   ],
   "scripts": {
     "start:server": "cd packages/server && pnpm run start",
@@ -31,5 +34,10 @@
     "rimraf": "3.0.2",
     "typescript": "4.5.2"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "resolutions": {
+    "@xstyled/core": "3.1.2",
+    "@xstyled/system": "3.1.2",
+    "@xstyled/util": "3.1.0"
+  }
 }

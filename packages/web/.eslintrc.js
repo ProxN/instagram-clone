@@ -3,11 +3,12 @@ module.exports = {
     browser: true,
     es2021: true,
   },
+  root: true,
   extends: [
     'eslint:recommended',
     'next',
-    'next/core-web-vitals',
     '../../.eslintrc.js',
+    'next/core-web-vitals',
   ],
   settings: {
     react: {
@@ -25,8 +26,9 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint', 'import'],
+  plugins: ['react', '@typescript-eslint'],
   rules: {
+    '@typescript-eslint/no-unused-vars': 'off',
     'jsx-quotes': ['error', 'prefer-single'],
     'react/prop-types': 'off',
     'react/jsx-props-no-spreading': 'off',

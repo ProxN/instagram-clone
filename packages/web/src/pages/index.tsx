@@ -4,7 +4,7 @@ import * as yup from 'yup';
 import toast from 'react-hot-toast';
 import { Controller, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
-import { yupResolver } from '@hookform/resolvers/yup/dist/yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { WithNoUser } from '@lib/utility/withNoUser';
 import { client } from '@lib/utility/graphqlClient';
 import { LoginInputs, useSigninMutation, MeQuery } from '@lib/graphql';
