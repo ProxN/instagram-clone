@@ -14,6 +14,7 @@
   "scripts": {
     "start:server": "cd packages/server && yarn start",
     "build:server": "cd packages/server && yarn build",
+    "build": "yarn build:server",
     "lint": "lerna run lint",
     "typecheck": "lerna run typecheck",
     "prettier": "lerna run prettier",
