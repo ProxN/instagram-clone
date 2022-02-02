@@ -1,5 +1,5 @@
-import { config } from 'dotenv';
-config({ path: './config.env' });
+import dotenv from 'dotenv';
+dotenv.config({ path: './config.env' });
 
 export default {
   type: 'postgres',

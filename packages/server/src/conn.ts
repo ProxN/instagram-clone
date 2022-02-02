@@ -19,7 +19,10 @@ const connectDB = async () => {
     migrations: [path.join(__dirname, './migrations/*.ts')],
   })
     .then(() => logger.info('DB CONNECTED SUCCESSFULY'))
-    .catch((err) => Sentry.captureException(err));
+    .catch((err) => {
+      logger.error(err);
+      Sentry.captureException(err);
+    });
 };
 
 export default connectDB;
