@@ -7,5 +7,11 @@
             "src": "packages/web/package.json",
             "use": "@vercel/next"
         }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "packages/web/$1"
+        }
     ]
 }
