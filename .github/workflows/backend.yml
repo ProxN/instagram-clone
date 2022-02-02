@@ -53,7 +53,7 @@ jobs:
             echo $PATH
             cd /home/ubuntu/instagram-clone
             rm -rf packages/web
-            yarn
+            yarn install --production=false
             cd packages/server
             yarn build
 
