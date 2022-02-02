@@ -27,7 +27,7 @@ jobs:
           cmd: install
       - uses: borales/actions-yarn@v2.3.0
         with:
-          cmd: cd packages/web && yarn build
+          cmd: build:web
 
   deploy:
     needs: build

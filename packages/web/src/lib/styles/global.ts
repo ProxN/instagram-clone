@@ -25,7 +25,7 @@ const GlobalStyles = createGlobalStyle`
 
     body{
         font-weight:normal;
-        line-height:1.35;
+        line-height:1.45;
         ${({ theme }) => css`
           background: ${mode(
             theme.white,
