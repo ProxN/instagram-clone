@@ -58,4 +58,3 @@ jobs:
             pnpm install
             cd packages/server
             pnpm run build
-            pm2 restart app1
