@@ -78,8 +78,8 @@ const SendMessageModal: React.FC<SendMessageModalProps> = ({
   const handleNextClick = () => {
     if (selectUser) {
       router.push(
-        `/home/inbox?userId=${selectUser.id}&username=${selectUser.username}`,
-        `/home/inbox/${selectUser.id}`
+        `/inbox?userId=${selectUser.id}&username=${selectUser.username}`,
+        `/inbox/${selectUser.id}`
       );
       onClose();
     }

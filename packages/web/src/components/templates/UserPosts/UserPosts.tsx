@@ -82,7 +82,7 @@ const UserPosts: React.FC<{ user_id: string }> = ({ user_id }) => {
                   pathname: router.pathname,
                   query: { ...router.query, postId: el.id },
                 }}
-                as={`/home/p/${el.id}`}
+                as={`/p/${el.id}`}
               >
                 <PostContainer
                   key={el.id}

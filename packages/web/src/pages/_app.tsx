@@ -10,7 +10,7 @@ import { Toaster } from '@components/elements/Toaster';
 import AppLayout from '@components/templates/AppLayout/AppLayout';
 
 const authLinks = [
-  '/',
+  '/signin',
   '/login',
   '/signup',
   '/forgot_password',

@@ -59,7 +59,7 @@ const SavedPosts = () => {
               pathname: router.pathname,
               query: { ...router.query, postId: el.id },
             }}
-            as={`/home/p/${el.id}`}
+            as={`/p/${el.id}`}
           >
             <PostContainer key={el.id}>
               {/*Overlay */}

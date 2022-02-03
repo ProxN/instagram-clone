@@ -4,7 +4,7 @@ export async function getServerSideProps(context: NextPageContext) {
   if (context.query.create === 'select' || context.query.create === 'details') {
     return {
       redirect: {
-        destination: '/home',
+        destination: '/',
         permanent: false,
       },
     };

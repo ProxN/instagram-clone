@@ -60,7 +60,7 @@ const Follow: React.FC<FollowProps> = ({
         <Avatar src={avatar || '/default.jpg'} />
         <Flex flexDirection='column' ml={3} flex='1'>
           <Text style={{ alignItems: 'center' }}>
-            <NextLink href={`/home/${username}`}>
+            <NextLink href={`/${username}`}>
               <Text
                 cursor='pointer'
                 textDecoration={{ hover: 'underline' }}

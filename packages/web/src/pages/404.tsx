@@ -12,7 +12,7 @@ const Custom404 = () => {
         </Text>
         <Text size='md' mt={6}>
           The link you followed may be broken, or the page may have been
-          removed. <NextLink href='/home'>Go back</NextLink>
+          removed. <NextLink href='/'>Go back</NextLink>
         </Text>
       </Flex>
     </Box>

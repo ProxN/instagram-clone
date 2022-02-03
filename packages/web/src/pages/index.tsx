@@ -1,104 +1,109 @@
-import Router from 'next/router';
-import Head from 'next/head';
-import * as yup from 'yup';
-import toast from 'react-hot-toast';
-import { Controller, useForm } from 'react-hook-form';
-import { useQueryClient } from 'react-query';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { WithNoUser } from '@lib/utility/withNoUser';
+import { useRouter } from 'next/router';
+import { Box } from '@components/layout/Box';
+import { Feed } from '@components/templates/Feed';
+import { PostModal } from '@components/elements/PostModal';
+import { Suggestions } from '@components/elements/Suggestions';
+import {
+  useInfiniteFollowerSuggestionQuery,
+  useInfiniteUserFeedsQuery,
+} from '@lib/graphql';
+import { useShow } from '@lib/hooks/useShow';
 import { client } from '@lib/utility/graphqlClient';
-import { LoginInputs, useSigninMutation, MeQuery } from '@lib/graphql';
-import { Button } from '@components/elements/Button';
-import { TextInput } from '@components/elements/TextInput';
-import { AuthForm } from '@components/templates/AuthForm';
+import { Loader } from '@components/elements/Loader';
+import { Flex } from '@components/layout/Flex';
+import { Text } from '@components/elements/Text';
+import { Follow } from '@components/elements/Follow';
+import { withUser } from '@lib/utility/withUser';
 
-const LoginSchema = yup
-  .object({
-    email: yup
-      .string()
-      .email('You have entered an invalid email address. Please try again.')
-      .required(),
-    password: yup
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .required(),
-  })
-  .required();
+const Home = () => {
+  const { show } = useShow(['lg', 'xl']);
+  const router = useRouter();
 
-const Login = () => {
-  const queryClient = useQueryClient();
-  const { control, handleSubmit, formState } = useForm<LoginInputs>({
-    resolver: yupResolver(LoginSchema),
-    mode: 'onChange',
-    defaultValues: {
-      email: '',
-      password: '',
+  const { data, isLoading } = useInfiniteUserFeedsQuery(
+    'cursor',
+    client,
+    {
+      limit: 30,
+      cursor: undefined,
     },
-  });
-  const { mutate, isLoading } = useSigninMutation(client, {
-    onSuccess: (data) => {
-      if (data.signin.error) {
-        toast.error(data.signin.error.message);
-      }
-      if (data.signin.user) {
-        queryClient.setQueryData<MeQuery>(['Me'], {
-          me: data.signin.user,
-        });
-        Router.push('/home');
-      }
-    },
-  });
+    {
+      getNextPageParam: (lastPage) => {
+        if (!lastPage.userFeeds.hasMore) return undefined;
+        const postsLength = lastPage.userFeeds.posts.length;
+        return { cursor: lastPage.userFeeds.posts[postsLength - 1].createdAt };
+      },
+    }
+  );
 
-  const onSubmit = (inputs: LoginInputs) => {
-    mutate(inputs);
-  };
+  const { data: suggestions, isLoading: suggestionsLoading } =
+    useInfiniteFollowerSuggestionQuery('cursor', client, { limit: 30 });
+
+  if (data && data.pages[0].userFeeds.posts.length === 0)
+    return (
+      <Box as='section' padding='3rem'>
+        <Box mx='auto' maxW='54rem'>
+          <Text
+            as='h2'
+            size='md'
+            fontWeight='semibold'
+            mb={2}
+            display='inline-block'
+          >
+            Suggestions for you
+          </Text>
+          <Flex
+            background='#fff'
+            border='1px solid'
+            borderColor='blackAlpha.3'
+            padding='1rem 1.5rem'
+            flexDirection='column'
+          >
+            {suggestionsLoading ? (
+              <Flex h='4rem' justifyContent='center'>
+                <Loader />
+              </Flex>
+            ) : (
+              suggestions?.pages[0].followerSuggestion.users.map((el) => (
+                <Follow
+                  key={el.id}
+                  username={el.username}
+                  avatar={el.avatar}
+                  id={el.id}
+                  name={el.name}
+                  buttonText='follow'
+                />
+              ))
+            )}
+          </Flex>
+        </Box>
+      </Box>
+    );
 
   return (
-    <AuthForm onSubmit={handleSubmit(onSubmit)} title='Log in.'>
-      <Head>
-        <title>Fullstack boilerplate - Login</title>
-      </Head>
-      <Controller
-        render={({ field, fieldState: { error, invalid } }) => (
-          <TextInput
-            placeholder='Enter your email'
-            label='Email'
-            id='email'
-            isInvalid={invalid}
-            error={error?.message}
-            {...field}
-          />
-        )}
-        name='email'
-        control={control}
-      />
-      <Controller
-        render={({ field, fieldState: { error, invalid } }) => (
-          <TextInput
-            placeholder='Enter your password'
-            type='password'
-            label='Password'
-            id='password'
-            error={error?.message}
-            isInvalid={invalid}
-            {...field}
-          />
-        )}
-        name='password'
-        control={control}
-      />
-
-      <Button
-        isDisabled={!formState.isValid || isLoading}
-        isLoading={isLoading}
-        type='submit'
-        radius='sm'
-        isPrimary
-      >
-        login
-      </Button>
-    </AuthForm>
+    <Box
+      padding={{ sm: '3rem 0' }}
+      as='section'
+      mx='auto'
+      maxW={{ xs: '64.6rem', lg: '94rem' }}
+    >
+      <Box display='flex'>
+        <Box flex='1' mr={{ lg: '2rem' }} maxW={{ md: '100%', lg: '64.6rem' }}>
+          {isLoading ? (
+            <Flex paddingTop={20} alignItems='center' justifyContent='center'>
+              <Loader />
+            </Flex>
+          ) : (
+            <>
+              {/* <Stories /> */}
+              <Feed data={data} />
+            </>
+          )}
+        </Box>
+        {show && <Suggestions />}
+      </Box>
+      {!!router.query.postId && <PostModal />}
+    </Box>
   );
 };
 
-export default WithNoUser(Login);
+export default withUser(Home);

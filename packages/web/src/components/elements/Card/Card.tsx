@@ -133,7 +133,7 @@ const Card: React.FC<CardProps> = ({ post, user }) => {
         >
           <Flex alignItems='center'>
             <Avatar addBorder src={user.avatar || '/default.jpg'} size='md' />
-            <NextLink href={`/home/${user.username}`}>
+            <NextLink href={`/${user.username}`}>
               <Text cursor='pointer' as='a' ml={3}>
                 {user.username}
               </Text>
@@ -172,7 +172,7 @@ const Card: React.FC<CardProps> = ({ post, user }) => {
         </Box>
         <Box padding='0 1.5rem 1.5rem 1.5rem'>
           <Box mb='.4rem'>
-            <NextLink href={`/home/${user.username}`}>
+            <NextLink href={`/${user.username}`}>
               <Text fontWeight='semibold' as='a' cursor='pointer'>
                 {user.username}&nbsp;
               </Text>
@@ -200,7 +200,7 @@ const Card: React.FC<CardProps> = ({ post, user }) => {
                 pathname: router.pathname,
                 query: { ...router.query, postId: post.id },
               }}
-              as={`/home/p/${post.id}`}
+              as={`/p/${post.id}`}
               scroll={false}
             >
               <Text cursor='pointer' color='gray'>

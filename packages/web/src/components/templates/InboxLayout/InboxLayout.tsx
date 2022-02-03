@@ -94,8 +94,8 @@ const InboxLayout: React.FC = ({ children }) => {
             <>
               {data?.getUserInbox.map((el) => (
                 <NextLink
-                  href={`/home/inbox?userId=${el.user?.id}&username=${el.user?.username}`}
-                  as={`/home/inbox/${el.id}`}
+                  href={`/inbox?userId=${el.user?.id}&username=${el.user?.username}`}
+                  as={`/inbox/${el.id}`}
                   key={el.id}
                 >
                   <Box

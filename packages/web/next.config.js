@@ -19,18 +19,18 @@ module.exports = (phase) => {
   const redirects = async () => {
     return [
       {
-        source: '/home/:profile/followers',
-        destination: '/home/:profile',
+        source: '/:profile/followers',
+        destination: '/:profile',
         permanent: false,
       },
       {
-        source: '/home/:profile/following',
-        destination: '/home/:profile',
+        source: '/:profile/following',
+        destination: '/:profile',
         permanent: false,
       },
       {
-        source: '/home/inbox/:userId',
-        destination: '/home/inbox',
+        source: '/inbox/:userId',
+        destination: '/inbox',
         permanent: false,
       },
     ];

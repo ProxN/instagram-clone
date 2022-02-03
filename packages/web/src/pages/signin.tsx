@@ -1,17 +1,18 @@
-import { useRouter } from 'next/router';
-import { Controller, useForm } from 'react-hook-form';
+import Router from 'next/router';
+import Head from 'next/head';
 import * as yup from 'yup';
 import toast from 'react-hot-toast';
+import { Controller, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
-import { yupResolver } from '@hookform/resolvers/yup/dist/yup';
-import { SignupInputs, useSignupMutation, MeQuery } from '@lib/graphql';
-import { client } from '@lib/utility/graphqlClient';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { WithNoUser } from '@lib/utility/withNoUser';
+import { client } from '@lib/utility/graphqlClient';
+import { LoginInputs, useSigninMutation, MeQuery } from '@lib/graphql';
 import { Button } from '@components/elements/Button';
 import { TextInput } from '@components/elements/TextInput';
 import { AuthForm } from '@components/templates/AuthForm';
 
-const SignupSchema = yup
+const LoginSchema = yup
   .object({
     email: yup
       .string()
@@ -21,45 +22,42 @@ const SignupSchema = yup
       .string()
       .min(8, 'Password must be at least 8 characters')
       .required(),
-    name: yup.string().required(),
-    username: yup.string().required(),
   })
   .required();
 
-const SignUp = () => {
-  const router = useRouter();
+const Login = () => {
   const queryClient = useQueryClient();
-  const { control, handleSubmit, formState } = useForm<SignupInputs>({
-    resolver: yupResolver(SignupSchema),
+  const { control, handleSubmit, formState } = useForm<LoginInputs>({
+    resolver: yupResolver(LoginSchema),
     mode: 'onChange',
     defaultValues: {
       email: '',
       password: '',
-      username: '',
-      name: '',
     },
   });
-
-  const { mutate, isLoading } = useSignupMutation(client, {
+  const { mutate, isLoading } = useSigninMutation(client, {
     onSuccess: (data) => {
-      if (data.signup.error) {
-        toast.error(data.signup.error.message);
+      if (data.signin.error) {
+        toast.error(data.signin.error.message);
       }
-      if (data.signup.user) {
+      if (data.signin.user) {
         queryClient.setQueryData<MeQuery>(['Me'], {
-          me: data.signup.user,
+          me: data.signin.user,
         });
-        router.push('/');
+        Router.push('/');
       }
     },
   });
 
-  const onSubmit = (data: SignupInputs) => {
-    mutate(data);
+  const onSubmit = (inputs: LoginInputs) => {
+    mutate(inputs);
   };
 
   return (
-    <AuthForm onSubmit={handleSubmit(onSubmit)} page='signup' title='Sign up.'>
+    <AuthForm onSubmit={handleSubmit(onSubmit)} title='Log in.'>
+      <Head>
+        <title>Instagram clone</title>
+      </Head>
       <Controller
         render={({ field, fieldState: { error, invalid } }) => (
           <TextInput
@@ -72,34 +70,6 @@ const SignUp = () => {
           />
         )}
         name='email'
-        control={control}
-      />
-      <Controller
-        render={({ field, fieldState: { error, invalid } }) => (
-          <TextInput
-            placeholder='Enter your fullname'
-            label='Fullname'
-            id='name'
-            error={error?.message}
-            isInvalid={invalid}
-            {...field}
-          />
-        )}
-        name='name'
-        control={control}
-      />
-      <Controller
-        render={({ field, fieldState: { error, invalid } }) => (
-          <TextInput
-            placeholder='Enter your username'
-            label='Username'
-            id='username'
-            error={error?.message}
-            isInvalid={invalid}
-            {...field}
-          />
-        )}
-        name='username'
         control={control}
       />
       <Controller
@@ -125,10 +95,10 @@ const SignUp = () => {
         radius='sm'
         isPrimary
       >
-        Sign Up
+        login
       </Button>
     </AuthForm>
   );
 };
 
-export default WithNoUser(SignUp);
+export default WithNoUser(Login);

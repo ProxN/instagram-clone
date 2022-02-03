@@ -76,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
               variant='link'
             />
           </Box>
-          <NextLink href='/home'>
+          <NextLink href='/'>
             <Box fontSize='xx-large' cursor='pointer' as='a'>
               <Icon name='logo' />
             </Box>
@@ -119,7 +119,7 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
               as='ul'
               size='md'
             >
-              <NextLink href='/home'>
+              <NextLink href='/'>
                 <li>
                   <IconButton
                     size='sm'
@@ -128,15 +128,13 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
                     variant='link'
                     icon={
                       <Icon
-                        name={
-                          router.pathname === '/home' ? 'home-sharp' : 'home'
-                        }
+                        name={router.pathname === '/' ? 'home-sharp' : 'home'}
                       />
                     }
                   />
                 </li>
               </NextLink>
-              <NextLink href='/home/inbox'>
+              <NextLink href='/inbox'>
                 <li>
                   <Box position='relative'>
                     <IconButton
@@ -241,7 +239,7 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
                       borderColor='blackAlpha.1'
                     >
                       <Flex flexDirection='column' fontSize='1.6rem'>
-                        <NextLink href={`/home/${username}`}>
+                        <NextLink href={`/${username}`}>
                           <Flex
                             backgroundColor={{ hover: 'gray.0' }}
                             cursor='pointer'

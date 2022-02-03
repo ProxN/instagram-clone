@@ -29,9 +29,7 @@ const PostOption: React.FC<PostOptionProps> = ({
   const currentUser = queryClient.getQueryData<MeQuery>(useMeQuery.getKey());
 
   const handleCopyToClipBoard = () => {
-    navigator.clipboard.writeText(
-      `${window.location.origin}/home/p/${post_id}`
-    );
+    navigator.clipboard.writeText(`${window.location.origin}/p/${post_id}`);
     toast.success('Link copied to clipboard.');
     onClose();
   };
@@ -66,7 +64,7 @@ const PostOption: React.FC<PostOptionProps> = ({
           )}
           {!hideGoToPostLink && (
             <Box borderBottom='1px solid' borderColor='blackAlpha.2'>
-              <NextLink href={`/home/p/${post_id}`}>
+              <NextLink href={`/p/${post_id}`}>
                 <Button fullWidth variant='ghost'>
                   Go to post
                 </Button>

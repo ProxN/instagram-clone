@@ -149,8 +149,8 @@ const Profile = ({ username }: { username: string }) => {
                   ) : data.getUserProfile.has_followed ? (
                     <>
                       <NextLink
-                        href={`/home/inbox?userId=${data.getUserProfile.id}&username=${data.getUserProfile.username}`}
-                        as={`/home/inbox/${data.getUserProfile.id}`}
+                        href={`/inbox?userId=${data.getUserProfile.id}&username=${data.getUserProfile.username}`}
+                        as={`/inbox/${data.getUserProfile.id}`}
                       >
                         <Button mr={2} size='sm' variant='outline'>
                           Message

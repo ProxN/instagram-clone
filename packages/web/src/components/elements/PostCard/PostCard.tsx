@@ -99,7 +99,7 @@ const PostCard: React.FC<PostCardProps> = (props) => {
     useDeletePostMutation(client, {
       onSuccess: (data) => {
         if (data.deletePost.deleted) {
-          router.push(`/home/${user.username}`);
+          router.push(`/${user.username}`);
           queryClient.invalidateQueries([
             'GetUserPosts.infinite',
             { limit: 30, user_id: user.id },
