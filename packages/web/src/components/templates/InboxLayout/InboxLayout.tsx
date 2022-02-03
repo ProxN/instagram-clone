@@ -39,7 +39,7 @@ const InboxLayout: React.FC = ({ children }) => {
         borderRight='1px solid'
         borderColor='blackAlpha.3'
         overflow='hidden'
-        display={{ xs: router.query.userId ? 'none' : 'unset' }}
+        display={{ xs: router.query.userId ? 'none' : 'unset', sm: 'block' }}
       >
         {/* Aside header */}
         <Flex
