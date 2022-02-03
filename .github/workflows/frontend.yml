@@ -42,4 +42,3 @@ jobs:
           vercel-args: '--prod --force'
           vercel-org-id: ${{ secrets.ORG_ID}}
           vercel-project-id: ${{ secrets.PROJECT_ID}}
-          working-directory: ./packages/web

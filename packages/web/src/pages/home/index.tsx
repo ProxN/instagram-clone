@@ -81,8 +81,8 @@ const Home = () => {
 
   return (
     <Box
-      as='section'
       padding={{ sm: '3rem 0' }}
+      as='section'
       mx='auto'
       maxW={{ xs: '64.6rem', lg: '94rem' }}
     >
