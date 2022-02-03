@@ -56,7 +56,6 @@ const Main = async () => {
   const pubSub = new PubSub();
   const httpServer = createServer(app);
 
-  app.set('trust proxy', 1);
   app.use(helmet({ contentSecurityPolicy: IS_PROD ? undefined : false }));
   app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
   app.use(
@@ -65,6 +64,7 @@ const Main = async () => {
       credentials: true,
     })
   );
+  app.set('trust proxy', 1);
   app.use(cookieParser());
 
   const sessionMiddleware = session({
@@ -75,6 +75,7 @@ const Main = async () => {
     name: 'sid',
     secret: SESSION_SECRET || 'secret',
     saveUninitialized: false,
+    proxy: true,
     resave: false,
     cookie: {
       httpOnly: true,
