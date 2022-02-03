@@ -10,7 +10,7 @@ import { PostCardLoader } from '@components/elements/PostCardLoader';
 const Post = () => {
   const router = useRouter();
   const post_id = router.query.id as string;
-  const { data, isLoading } = useGetPostQuery(client, {
+  const { data, isLoading, status } = useGetPostQuery(client, {
     post_id,
   });
   const {
@@ -19,7 +19,8 @@ const Post = () => {
     fetchNextPage,
   } = useGetComments(post_id);
 
-  if (!data || !data.getPost) return <Error statusCode={404} />;
+  if (status === 'success' && (!data || !data.getPost))
+    return <Error statusCode={404} />;
 
   return (
     <Box as='section' padding='5rem 0'>
@@ -33,23 +34,26 @@ const Post = () => {
         {isLoading ? (
           <PostCardLoader />
         ) : (
-          <PostCard
-            hideGoToPostLink={true}
-            hasMoreComments={hasNextPage}
-            fetchMoreComments={fetchNextPage}
-            createdAt={data.getPost.createdAt}
-            comments={comments}
-            likes={data.getPost.likes}
-            post_id={data.getPost.id}
-            post_url={data.getPost.post_url}
-            caption={data.getPost.caption}
-            user={{
-              id: data.getPost.user.id,
-              username: data.getPost.user.username,
-              avatar: data.getPost.user.avatar,
-              has_followed: data.getPost.user.has_followed,
-            }}
-          />
+          data &&
+          data.getPost && (
+            <PostCard
+              hideGoToPostLink={true}
+              hasMoreComments={hasNextPage}
+              fetchMoreComments={fetchNextPage}
+              createdAt={data.getPost.createdAt}
+              comments={comments}
+              likes={data.getPost.likes}
+              post_id={data.getPost.id}
+              post_url={data.getPost.post_url}
+              caption={data.getPost.caption}
+              user={{
+                id: data.getPost.user.id,
+                username: data.getPost.user.username,
+                avatar: data.getPost.user.avatar,
+                has_followed: data.getPost.user.has_followed,
+              }}
+            />
+          )
         )}
       </Box>
     </Box>

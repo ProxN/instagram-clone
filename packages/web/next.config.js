@@ -16,6 +16,25 @@ module.exports = (phase) => {
     IS_PROD,
     WEBSOCKET_API,
   };
+  const redirects = async () => {
+    return [
+      {
+        source: '/home/:profile/followers',
+        destination: '/home/:profile',
+        permanent: false,
+      },
+      {
+        source: '/home/:profile/following',
+        destination: '/home/:profile',
+        permanent: false,
+      },
+      {
+        source: '/home/inbox/:userId',
+        destination: '/home/inbox',
+        permanent: false,
+      },
+    ];
+  };
 
   return {
     env,
@@ -26,6 +45,7 @@ module.exports = (phase) => {
         'res.cloudinary.com',
       ],
     },
+    redirects,
     webpack(config) {
       config.module.rules.push({
         test: /\.svg$/,
