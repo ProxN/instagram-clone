@@ -6,14 +6,13 @@ import {
   useGetUserInboxQuery,
 } from '@lib/graphql';
 
-const endpoint = process.env.API_URL as string;
-const url = `ws://${endpoint}/graphql`;
+const endpoint = process.env.WEBSOCKET_API as string;
 
 export const useMessagesSubscription = (receiver_id: string) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const ws = new WebSocket(url, 'graphql-ws');
+    const ws = new WebSocket(endpoint, 'graphql-ws');
 
     ws.onopen = () => {
       ws.send(JSON.stringify({ type: 'connection_init', payload: {} }));

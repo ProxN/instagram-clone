@@ -9,10 +9,12 @@ module.exports = (phase) => {
   const IS_PROD =
     phase === PHASE_PRODUCTION_BUILD && process.env.STAGING !== '1';
   const API_URL = process.env.API_URL;
+  const WEBSOCKET_API = process.env.WEBSOCKET_API;
   const env = {
     API_URL,
     IS_DEV,
     IS_PROD,
+    WEBSOCKET_API,
   };
 
   return {
