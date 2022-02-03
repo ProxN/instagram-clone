@@ -31,7 +31,7 @@ import { SavedPosts } from '@components/templates/SavedPosts';
 
 type Tabs = 'posts' | 'saved';
 
-const Profile = ({ username }: { username: string }) => {
+const Profile = () => {
   const router = useRouter();
   const [currentTab, setCurrentTab] = useState<Tabs>('posts');
   const queryClient = useQueryClient();
@@ -42,7 +42,7 @@ const Profile = ({ username }: { username: string }) => {
     onOpen: onSettingsOpen,
   } = useDisclosure();
   const { data, isLoading } = useGetUserProfileQuery(client, {
-    username,
+    username: router.query.profile as string,
   });
 
   const { mutate: followMutation, isLoading: followIsLoading } =
@@ -50,7 +50,9 @@ const Profile = ({ username }: { username: string }) => {
       onSuccess: (data) => {
         if (data.follow.result) {
           queryClient.setQueryData<GetUserProfileQuery>(
-            useGetUserProfileQuery.getKey({ username }),
+            useGetUserProfileQuery.getKey({
+              username: router.query.profile as string,
+            }),
             (old: any) => {
               return {
                 ...old,
@@ -66,7 +68,9 @@ const Profile = ({ username }: { username: string }) => {
       onSuccess: (data) => {
         if (data.unFollow.result) {
           queryClient.setQueryData<GetUserProfileQuery>(
-            useGetUserProfileQuery.getKey({ username }),
+            useGetUserProfileQuery.getKey({
+              username: router.query.profile as string,
+            }),
             (old: any) => {
               return {
                 ...old,
@@ -437,7 +441,7 @@ const Profile = ({ username }: { username: string }) => {
         isLoading={unFollowLoading}
         handleUnFollow={unFollowHandler}
         id={data.getUserProfile.id}
-        username={username}
+        username={data.getUserProfile.username}
         isOpen={isOpen}
         onClose={onClose}
         avatar={data.getUserProfile.avatar}
@@ -454,28 +458,5 @@ const Profile = ({ username }: { username: string }) => {
     </>
   );
 };
-
-export async function getServerSideProps(context: NextPageContext) {
-  const queryClient = new QueryClient();
-  const headers: HeadersInit = new Headers();
-  const cookie =
-    context.req?.headers['cookie'] && context.req?.headers['cookie'];
-  const username = context.query.profile as string;
-
-  if (cookie) {
-    headers.set('cookie', cookie);
-  }
-  await queryClient.prefetchQuery(
-    useGetUserProfileQuery.getKey({ username }),
-    useGetUserProfileQuery.fetcher(client, { username }, headers)
-  );
-
-  return {
-    props: {
-      username,
-      dehydratedState: dehydrate(queryClient),
-    },
-  };
-}
 
 export default Profile;
