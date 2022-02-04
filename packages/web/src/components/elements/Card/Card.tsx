@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, memo } from 'react';
+import { InfiniteData, useQueryClient } from 'react-query';
+import toast from 'react-hot-toast';
 import NextLink from 'next/link';
 import Image from 'next/image';
 import { useUp } from '@xstyled/styled-components';
@@ -19,11 +21,9 @@ import { IconButton } from '../IconButton';
 import { Text } from '../Text';
 import { useInputFocus } from '@lib/hooks/useInputFocus';
 import { dayjs } from '@lib/utility/dayjs';
-import { PostOption } from '../PostOption';
 import { useDisclosure } from '@lib/hooks/useDisclosure';
+import { PostOption } from '../PostOption';
 import { DeletePostModal } from '../DeletePostModal';
-import { InfiniteData, useQueryClient } from 'react-query';
-import toast from 'react-hot-toast';
 
 interface CardProps {
   post: {
@@ -235,4 +235,4 @@ const Card: React.FC<CardProps> = ({ post, user }) => {
   );
 };
 
-export default Card;
+export default memo(Card);

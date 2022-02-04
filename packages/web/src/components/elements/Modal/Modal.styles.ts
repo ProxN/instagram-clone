@@ -1,8 +1,8 @@
 import styled from '@xstyled/styled-components';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { mode } from '@lib/utility/component';
 
-export const Overylay = styled(motion.div)<{ rgba: number }>`
+export const Overylay = styled(m.div)<{ rgba: number }>`
   position: fixed;
   height: 100vh;
   width: 100%;
@@ -16,7 +16,7 @@ export const Overylay = styled(motion.div)<{ rgba: number }>`
     )(theme.colorMode)};
 `;
 
-export const ModalContainer = styled(motion.div)`
+export const ModalContainer = styled(m.div)`
   display: flex;
   flex-direction: column;
   position: relative;

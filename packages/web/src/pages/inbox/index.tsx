@@ -1,14 +1,25 @@
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 import { Button } from '@components/elements/Button';
 import { Icon } from '@components/elements/Icon';
 import { Text } from '@components/elements/Text';
 import { Box } from '@components/layout/Box';
 import { Flex } from '@components/layout/Flex';
-import ChatBox from '@components/templates/ChatBox/ChatBox';
 import { InboxLayout } from '@components/templates/InboxLayout';
-import { SendMessageModal } from '@components/templates/SendMessageModal';
 import { useDisclosure } from '@lib/hooks/useDisclosure';
 import { withUser } from '@lib/utility/withUser';
+import type { ChatBoxProps } from '@components/templates/ChatBox';
+import type { SendMessageModalProps } from '@components/templates/SendMessageModal';
+
+const DynamicMessageModal = dynamic<SendMessageModalProps>(() =>
+  import('@components/templates/SendMessageModal').then(
+    (mod) => mod.SendMessageModal
+  )
+);
+
+const DynamicChatBox = dynamic<ChatBoxProps>(() =>
+  import('@components/templates/ChatBox').then((mod) => mod.ChatBox)
+);
 
 const Inbox = () => {
   const router = useRouter();
@@ -44,10 +55,10 @@ const Inbox = () => {
             </Button>
           </Flex>
         ) : (
-          <ChatBox user_id={router.query.userId as string} />
+          <DynamicChatBox user_id={router.query.userId as string} />
         )}
       </InboxLayout>
-      <SendMessageModal isOpen={isOpen} onClose={onClose} />
+      {isOpen && <DynamicMessageModal isOpen={isOpen} onClose={onClose} />}
     </Box>
   );
 };

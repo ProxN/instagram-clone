@@ -30,7 +30,7 @@ import { FollowLoader } from '@components/elements/FollowLoader';
 import { useQueryClient } from 'react-query';
 import { useRouter } from 'next/router';
 
-interface SendMessageModalProps {
+export interface SendMessageModalProps {
   isOpen: boolean;
   onClose: () => void;
 }

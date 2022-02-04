@@ -1,4 +1,4 @@
-import Router from 'next/router';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 import * as yup from 'yup';
 import toast from 'react-hot-toast';
@@ -27,6 +27,7 @@ const LoginSchema = yup
 
 const Login = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { control, handleSubmit, formState } = useForm<LoginInputs>({
     resolver: yupResolver(LoginSchema),
     mode: 'onChange',
@@ -44,7 +45,7 @@ const Login = () => {
         queryClient.setQueryData<MeQuery>(['Me'], {
           me: data.signin.user,
         });
-        Router.push('/');
+        router.push('/');
       }
     },
   });
@@ -87,7 +88,6 @@ const Login = () => {
         name='password'
         control={control}
       />
-
       <Button
         isDisabled={!formState.isValid || isLoading}
         isLoading={isLoading}

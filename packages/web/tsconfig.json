@@ -39,8 +39,7 @@
     "next-env.d.ts",
     "*/.ts",
     "**/*.ts",
-    "**/*.tsx"
-  ],
+    "**/*.tsx" ],
   "exclude": [
     "node_modules",
     ".eslintrc.js"

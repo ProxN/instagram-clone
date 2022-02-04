@@ -1,13 +1,18 @@
 import { useState } from 'react';
 import { AppProps } from 'next/app';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { QueryClientProvider, QueryClient, Hydrate } from 'react-query';
+import { QueryClientProvider, QueryClient } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { Preflight, ThemeProvider } from '@xstyled/styled-components';
 import { Theme } from '@lib/theme';
 import { GlobalStyles } from '@lib/styles';
-import { Toaster } from '@components/elements/Toaster';
 import AppLayout from '@components/templates/AppLayout/AppLayout';
+import type { ToasterProps } from '@components/elements/Toaster';
+
+const DynamicToaster = dynamic<ToasterProps>(() =>
+  import('@components/elements/Toaster').then((mod) => mod.Toaster)
+);
 
 const authLinks = [
   '/signin',
@@ -38,18 +43,15 @@ const App = (props: AppProps) => {
       <GlobalStyles />
       <QueryClientProvider client={queryClient}>
         {!authLinks.includes(router.pathname) ? (
-          <Hydrate state={pageProps.dehydratedState}>
-            <AppLayout>
-              <Component {...pageProps} />
-            </AppLayout>
-          </Hydrate>
+          <AppLayout>
+            <Component {...pageProps} />
+          </AppLayout>
         ) : (
           <Component {...pageProps} />
         )}
-
         <ReactQueryDevtools />
       </QueryClientProvider>
-      <Toaster />
+      <DynamicToaster />
     </ThemeProvider>
   );
 };

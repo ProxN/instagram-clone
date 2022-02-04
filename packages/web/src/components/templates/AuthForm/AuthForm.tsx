@@ -47,7 +47,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
         <Box as='form' mt={3} w='100%' onSubmit={onSubmit}>
           <Space size={2} flexDirection='column'>
             {children}
-
             {hideLinks ? (
               ''
             ) : page === 'forgot_password' ? (

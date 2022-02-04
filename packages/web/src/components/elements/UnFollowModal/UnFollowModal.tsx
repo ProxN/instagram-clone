@@ -10,7 +10,7 @@ import { Text } from '@components/elements/Text';
 import { Box } from '@components/layout/Box';
 import { Flex } from '@components/layout/Flex';
 
-interface UnFollowModalProps {
+export interface UnFollowModalProps {
   username: string;
   id: string;
   isOpen: boolean;

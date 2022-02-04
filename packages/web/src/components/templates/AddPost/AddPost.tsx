@@ -77,8 +77,6 @@ const AddPost: React.FC = () => {
     });
   };
 
-  if (!router.query.createPost) return null;
-
   const handleFormClose = () => {
     const { ['createPost']: _, ...rest } = router.query;
     router.push({ pathname: router.pathname, query: rest });

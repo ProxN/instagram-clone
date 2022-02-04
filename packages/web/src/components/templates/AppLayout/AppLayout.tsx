@@ -1,9 +1,12 @@
-import { useQueryClient } from 'react-query';
+import dynamic from 'next/dynamic';
 import { Box } from '@components/layout/Box';
-import Header from './Header/Header';
-import { AddPost } from '../AddPost';
 import { useMeQuery } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
+import type { HeaderProps } from './Header/Header';
+
+const DynamicHeader = dynamic<HeaderProps>(() =>
+  import('./Header/Header').then((mod) => mod.Header)
+);
 
 const AppLayout: React.FC = ({ children }) => {
   const { data: user } = useMeQuery(client, undefined, {
@@ -13,12 +16,10 @@ const AppLayout: React.FC = ({ children }) => {
 
   return (
     <>
-      {user && user.me && <Header />}
+      {user && user.me && <DynamicHeader />}
       <Box as='main' minH='calc(100vh - 6rem)' backgroundColor='gray.0'>
         {children}
       </Box>
-      {/* Create new Post */}
-      <AddPost />
     </>
   );
 };

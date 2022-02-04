@@ -31,7 +31,7 @@ import { useInputFocus } from '@lib/hooks/useInputFocus';
 import { PostOption } from '../PostOption';
 import { DeletePostModal } from '../DeletePostModal';
 
-interface PostCardProps {
+export interface PostCardProps {
   post_url: string;
   post_id: string;
   caption?: string | null;

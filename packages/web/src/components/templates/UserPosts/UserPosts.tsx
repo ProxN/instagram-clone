@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useRef, Fragment } from 'react';
 import Image from 'next/image';
 import NextLink from 'next/link';
@@ -11,7 +12,6 @@ import { IconButton } from '@components/elements/IconButton';
 import { Icon } from '@components/elements/Icon';
 import { useInterSectionObserver } from '@lib/hooks/useInterSectionObserver';
 import { PostModal } from '../../elements/PostModal';
-import { useRouter } from 'next/router';
 
 const UserPosts: React.FC<{ user_id: string }> = ({ user_id }) => {
   const router = useRouter();

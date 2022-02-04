@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 import { Box } from '@components/layout/Box';
-import { Feed } from '@components/templates/Feed';
-import { PostModal } from '@components/elements/PostModal';
 import { Suggestions } from '@components/elements/Suggestions';
 import {
   useInfiniteFollowerSuggestionQuery,
@@ -14,6 +13,16 @@ import { Flex } from '@components/layout/Flex';
 import { Text } from '@components/elements/Text';
 import { Follow } from '@components/elements/Follow';
 import { withUser } from '@lib/utility/withUser';
+import type { FeedProps } from '@components/templates/Feed';
+import type { PostModalProps } from '@components/elements/PostModal';
+
+const DynamicFeed = dynamic<FeedProps>(() =>
+  import('@components/templates/Feed').then((mod) => mod.Feed)
+);
+
+const DynamicPostModal = dynamic<PostModalProps>(() =>
+  import('@components/elements/PostModal').then((mod) => mod.PostModal)
+);
 
 const Home = () => {
   const { show } = useShow(['lg', 'xl']);
@@ -93,15 +102,12 @@ const Home = () => {
               <Loader />
             </Flex>
           ) : (
-            <>
-              {/* <Stories /> */}
-              <Feed data={data} />
-            </>
+            <DynamicFeed data={data} />
           )}
         </Box>
         {show && <Suggestions />}
       </Box>
-      {!!router.query.postId && <PostModal />}
+      {!!router.query.postId && <DynamicPostModal />}
     </Box>
   );
 };

@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import {
   CloseModalButton,
   Modal,
@@ -10,9 +11,10 @@ import { useGetPostQuery } from '@lib/graphql';
 import { useGetComments } from '@lib/hooks/useGetComments';
 import { client } from '@lib/utility/graphqlClient';
 import { useUp } from '@xstyled/styled-components';
-import { useRouter } from 'next/router';
 
-const PostModal = () => {
+export interface PostModalProps {}
+
+const PostModal: React.FC<PostModalProps> = () => {
   const desktopScreen = useUp('md');
   const router = useRouter();
   const post_id = router.query.postId as string;

@@ -3,12 +3,12 @@ import { Modal, ModalContent, ModalOverylay } from '@components/elements/Modal';
 import { Box } from '@components/layout/Box';
 import { useLogout } from '@lib/hooks/useLogout';
 
-interface SettingsModal {
+export interface SettingsModalProps {
   onClose: () => void;
   isOpen: boolean;
 }
 
-const SettingsModal: React.FC<SettingsModal> = ({ isOpen, onClose }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const { handleLogout } = useLogout();
 
   return (

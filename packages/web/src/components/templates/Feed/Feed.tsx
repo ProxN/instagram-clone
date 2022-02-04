@@ -1,11 +1,10 @@
 import { Fragment } from 'react';
 import { InfiniteData } from 'react-query';
 import { Card } from '@components/elements/Card';
-// import { CardLoader } from '@components/elements/CardLoader';
 import { Box } from '@components/layout/Box';
 import { UserFeedsQuery } from '@lib/graphql';
 
-interface FeedProps {
+export interface FeedProps {
   data?: InfiniteData<UserFeedsQuery>;
 }
 

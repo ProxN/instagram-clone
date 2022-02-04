@@ -15,7 +15,12 @@ import { useGetUserFollowersQuery } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { Suggestions } from '@components/elements/Suggestions';
 
-const FollowersModal: React.FC<{ user_id: string; currentUser: boolean }> = ({
+export interface FollowersModalProps {
+  user_id: string;
+  currentUser: boolean;
+}
+
+const FollowersModal: React.FC<FollowersModalProps> = ({
   user_id,
   currentUser,
 }) => {

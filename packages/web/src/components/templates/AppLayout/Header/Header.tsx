@@ -1,57 +1,34 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Popover } from 'react-tiny-popover';
 import { Icon } from '@components/elements/Icon';
 import { Box } from '@components/layout/Box';
 import { Flex } from '@components/layout/Flex';
 import { TextInput } from '@components/elements/TextInput';
 import { Space } from '@components/layout/Space';
 import { IconButton } from '@components/elements/IconButton';
-import { Avatar } from '@components/elements/Avatar';
-import { Text } from '@components/elements/Text';
 import { Notification } from '@components/templates/Notification';
-import { useLogout } from '@lib/hooks/useLogout';
-import {
-  MeQuery,
-  useGetUnreadMessagesCountQuery,
-  useMeQuery,
-} from '@lib/graphql';
+import { useGetUnreadMessagesCountQuery } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { useUnreadMessages } from '@lib/hooks/useUnReadMessages';
-import { useQueryClient } from 'react-query';
+import { useDisclosure } from '@lib/hooks/useDisclosure';
+import { AvatarPopover } from './AvatarDropdown';
+import { AddPost } from '../../AddPost';
 
-const FadeConfig = {
-  enter: {
-    opacity: 1,
-    translateY: '-3px',
-    transition: { duration: 0.2, ease: [0, 0, 0.2, 1] },
-  },
-  exit: {
-    opacity: 0,
-    translateY: '5px',
-    transition: { duration: 0.1, ease: [0.4, 0, 1, 1] },
-  },
-};
+export interface HeaderProps {}
 
-const Header: React.FC = () => {
+export const Header: React.FC<HeaderProps> = () => {
   const [showMenu, setShowMenu] = useState(false);
-  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+  const { onClose, isOpen, onToggle } = useDisclosure();
   const router = useRouter();
-  const { handleLogout } = useLogout();
   const { data } = useGetUnreadMessagesCountQuery(client, undefined, {
     refetchOnWindowFocus: false,
   });
-  const queryClient = useQueryClient();
-
-  const user = queryClient.getQueryData<MeQuery>(useMeQuery.getKey());
-
   useUnreadMessages();
 
   useEffect(() => {
     const handleRouteChange = () => {
-      setShowAvatarMenu(false);
+      onClose();
       setShowMenu(false);
     };
 
@@ -60,7 +37,7 @@ const Header: React.FC = () => {
     return () => {
       router.events.off('routeChangeStart', handleRouteChange);
     };
-  }, [router]);
+  }, [onClose, router]);
 
   return (
     <>
@@ -123,7 +100,7 @@ const Header: React.FC = () => {
               as='ul'
               size='md'
             >
-              <NextLink href='/'>
+              <NextLink href='/' prefetch={false}>
                 <li>
                   <IconButton
                     size='sm'
@@ -205,114 +182,20 @@ const Header: React.FC = () => {
                 </li>
               </NextLink>
               <Notification />
-              {/* <li>
-                <IconButton
-                  size='sm'
-                  ariaLabel='home link'
-                  color='blackAlpha'
-                  variant='link'
-                  icon={<Icon name='heart' />}
-                />
-              </li> */}
             </Space>
           </Box>
 
           <Box ml={{ md: '1.6rem' }}>
-            <Popover
-              isOpen={showAvatarMenu}
-              positions={['bottom', 'left']}
-              align='end'
-              reposition={false}
-              onClickOutside={() => setShowAvatarMenu(false)}
-              padding={10}
-              containerStyle={{ zIndex: '9999' }}
-              content={() => (
-                <AnimatePresence>
-                  <motion.div
-                    variants={FadeConfig}
-                    initial='exit'
-                    animate='enter'
-                    exit='exit'
-                  >
-                    <Box
-                      backgroundColor='white'
-                      borderRadius='sm'
-                      boxShadow='sm'
-                      minW='20rem'
-                      border='1px solid'
-                      borderColor='blackAlpha.1'
-                    >
-                      <Flex flexDirection='column' fontSize='1.6rem'>
-                        <NextLink href={`/${user?.me?.username}`}>
-                          <Flex
-                            backgroundColor={{ hover: 'gray.0' }}
-                            cursor='pointer'
-                            alignItems='center'
-                            fontWeight='semibold'
-                            padding='.8rem 1.5rem'
-                          >
-                            <Box>
-                              <Icon name='user' />
-                            </Box>
-                            <Text ml='1rem'>Profile</Text>
-                          </Flex>
-                        </NextLink>
-                        <Flex
-                          cursor='pointer'
-                          backgroundColor={{ hover: 'gray.0' }}
-                          alignItems='center'
-                          fontWeight='semibold'
-                          padding='.8rem 1.5rem'
-                        >
-                          <Box>
-                            <Icon name='bookmark' />
-                          </Box>
-                          <Text ml='1rem'>Saved</Text>
-                        </Flex>
-                        <NextLink href='/accounts/edit'>
-                          <Flex
-                            cursor='pointer'
-                            backgroundColor={{ hover: 'gray.0' }}
-                            alignItems='center'
-                            fontWeight='semibold'
-                            padding='.8rem 1.5rem'
-                          >
-                            <Box>
-                              <Icon name='settings' />
-                            </Box>
-                            <Text ml='1rem'>Settings</Text>
-                          </Flex>
-                        </NextLink>
-                        <Flex
-                          onClick={handleLogout}
-                          cursor='pointer'
-                          alignItems='center'
-                          backgroundColor={{ hover: 'gray.0' }}
-                          fontWeight='semibold'
-                          padding='.8rem .6rem'
-                          borderTop='1px solid transparent'
-                          borderColor='blackAlpha.3'
-                        >
-                          <Text ml='1rem'>Log out</Text>
-                        </Flex>
-                      </Flex>
-                    </Box>
-                  </motion.div>
-                </AnimatePresence>
-              )}
-            >
-              <div>
-                <Avatar
-                  src={user?.me?.avatar || '/default.jpg'}
-                  onClick={() => setShowAvatarMenu(!showAvatarMenu)}
-                />
-              </div>
-            </Popover>
+            <AvatarPopover
+              isOpen={isOpen}
+              onClose={onClose}
+              onToggle={onToggle}
+            />
           </Box>
         </Flex>
       </Box>
+
+      {!!router.query.createPost && <AddPost />}
     </>
   );
 };
-
-export default Header;

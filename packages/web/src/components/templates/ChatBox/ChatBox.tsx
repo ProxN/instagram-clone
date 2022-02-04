@@ -46,7 +46,11 @@ const formateMessageDate = (date: number) => {
   return dayDate.format('LLL');
 };
 
-const ChatBox: React.FC<{ user_id: string }> = ({ user_id }) => {
+export interface ChatBoxProps {
+  user_id: string;
+}
+
+const ChatBox: React.FC<ChatBoxProps> = ({ user_id }) => {
   const queryClient = useQueryClient();
   const router = useRouter();
   useMessagesSubscription(user_id);

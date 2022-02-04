@@ -17,7 +17,11 @@ import { Flex } from '@components/layout/Flex';
 import { Icon } from '@components/elements/Icon';
 import { Suggestions } from '@components/elements/Suggestions';
 
-const FollowingModal: React.FC<{ user_id: string }> = ({ user_id }) => {
+export interface FollowingModalProps {
+  user_id: string;
+}
+
+const FollowingModal: React.FC<FollowingModalProps> = ({ user_id }) => {
   const router = useRouter();
   const { data, isLoading } = useGetUserFollowingQuery(client, { user_id });
 

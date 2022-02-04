@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, LazyMotion, domAnimation } from 'framer-motion';
 import { Portal } from '../Portal';
 import { Box, BoxProps } from '../../layout/Box';
 import { IconButton } from '../IconButton';
@@ -63,15 +63,17 @@ export const ModalOverylay: React.FC<{ rgba?: number }> = ({
   ...rest
 }) => {
   return (
-    <Overylay
-      variants={FadeConfig}
-      rgba={rgba}
-      initial='exit'
-      animate='enter'
-      {...rest}
-    >
-      {children}
-    </Overylay>
+    <LazyMotion features={domAnimation}>
+      <Overylay
+        variants={FadeConfig}
+        rgba={rgba}
+        initial='exit'
+        animate='enter'
+        {...rest}
+      >
+        {children}
+      </Overylay>
+    </LazyMotion>
   );
 };
 
@@ -114,18 +116,20 @@ export const ModalContent: React.FC = ({ children }) => {
       left='0'
       zIndex={999}
     >
-      <ModalContainer
-        style={{
-          maxWidth: size ? sizes[size] : sizes.md,
-          minHeight: size === 'full' ? '100vh' : '',
-        }}
-        variants={ScaleFade}
-        animate='enter'
-        exit='exit'
-        initial='exit'
-      >
-        {children}
-      </ModalContainer>
+      <LazyMotion features={domAnimation}>
+        <ModalContainer
+          style={{
+            maxWidth: size ? sizes[size] : sizes.md,
+            minHeight: size === 'full' ? '100vh' : '',
+          }}
+          variants={ScaleFade}
+          animate='enter'
+          exit='exit'
+          initial='exit'
+        >
+          {children}
+        </ModalContainer>
+      </LazyMotion>
     </Box>
   );
 };

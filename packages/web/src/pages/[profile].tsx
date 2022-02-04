@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Error from 'next/error';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
@@ -19,23 +21,21 @@ import {
 } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { Loader } from '@components/elements/Loader';
-import { SettingsModal } from '@components/templates/SettingsModal';
 import { useDisclosure } from '@lib/hooks/useDisclosure';
 import { UserPosts } from '@components/templates/UserPosts';
+import { SettingsModal } from '@components/templates/SettingsModal';
 import { FollowersModal } from '@components/templates/FollowersModal';
-import FollowingModal from '@components/templates/FollowingModal/FollowingModal';
+import { FollowingModal } from '@components/templates/FollowingModal';
 import { UnFollowModal } from '@components/elements/UnFollowModal';
-import { useState } from 'react';
 import { SavedPosts } from '@components/templates/SavedPosts';
 import { withUser } from '@lib/utility/withUser';
-import { profile } from 'console';
 
 type Tabs = 'posts' | 'saved';
 
 const Profile = () => {
   const router = useRouter();
-  const [currentTab, setCurrentTab] = useState<Tabs>('posts');
   const queryClient = useQueryClient();
+  const [currentTab, setCurrentTab] = useState<Tabs>('posts');
   const { onOpen, onClose, isOpen } = useDisclosure();
   const {
     isOpen: settingsOpen,
@@ -64,6 +64,7 @@ const Profile = () => {
         }
       },
     });
+
   const { mutate: unFollowMutation, isLoading: unFollowLoading } =
     useUnFollowMutation(client, {
       onSuccess: (data) => {
@@ -437,16 +438,21 @@ const Profile = () => {
         </Box>
       </Box>
       {/* Modal */}
-      <SettingsModal isOpen={settingsOpen} onClose={onCloseSettings} />
-      <UnFollowModal
-        isLoading={unFollowLoading}
-        handleUnFollow={unFollowHandler}
-        id={data.getUserProfile.id}
-        username={data.getUserProfile.username}
-        isOpen={isOpen}
-        onClose={onClose}
-        avatar={data.getUserProfile.avatar}
-      />
+      {settingsOpen && (
+        <SettingsModal isOpen={settingsOpen} onClose={onCloseSettings} />
+      )}
+
+      {isOpen && (
+        <UnFollowModal
+          isLoading={unFollowLoading}
+          handleUnFollow={unFollowHandler}
+          id={data.getUserProfile.id}
+          username={data.getUserProfile.username}
+          isOpen={isOpen}
+          onClose={onClose}
+          avatar={data.getUserProfile.avatar}
+        />
+      )}
       {!!router.query.followers && (
         <FollowersModal
           currentUser={currentUser?.me?.id === data.getUserProfile.id}

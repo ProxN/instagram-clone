@@ -2,7 +2,9 @@ import { Toaster as ReactToaster } from 'react-hot-toast';
 import { useTheme } from '@xstyled/styled-components';
 import { mode } from '@lib/utility/component';
 
-const Toaster = () => {
+export interface ToasterProps {}
+
+const Toaster: React.FC<ToasterProps> = () => {
   const { colors, colorMode } = useTheme();
 
   return (

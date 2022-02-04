@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { Popover } from 'react-tiny-popover';
 import { Avatar } from '@components/elements/Avatar';
 import { Button } from '@components/elements/Button';
@@ -98,8 +98,8 @@ const Notification = () => {
         padding={14}
         containerStyle={{ zIndex: '9999' }}
         content={() => (
-          <AnimatePresence>
-            <motion.div
+          <LazyMotion features={domAnimation}>
+            <m.div
               variants={FadeConfig}
               initial='exit'
               animate='enter'
@@ -162,8 +162,8 @@ const Notification = () => {
                   </>
                 )}
               </Box>
-            </motion.div>
-          </AnimatePresence>
+            </m.div>
+          </LazyMotion>
         )}
       >
         <li>

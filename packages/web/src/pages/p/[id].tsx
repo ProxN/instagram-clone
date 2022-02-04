@@ -1,12 +1,17 @@
 import Error from 'next/error';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { PostCard } from '@components/elements/PostCard';
 import { Box } from '@components/layout/Box';
 import { useGetPostQuery } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { useGetComments } from '@lib/hooks/useGetComments';
 import { PostCardLoader } from '@components/elements/PostCardLoader';
 import { withUser } from '@lib/utility/withUser';
+import type { PostCardProps } from '@components/elements/PostCard';
+
+const DynamicPostCard = dynamic<PostCardProps>(() =>
+  import('@components/elements/PostCard').then((mod) => mod.PostCard)
+);
 
 const Post = () => {
   const router = useRouter();
@@ -37,7 +42,7 @@ const Post = () => {
         ) : (
           data &&
           data.getPost && (
-            <PostCard
+            <DynamicPostCard
               hideGoToPostLink={true}
               hasMoreComments={hasNextPage}
               fetchMoreComments={fetchNextPage}
