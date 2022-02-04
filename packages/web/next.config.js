@@ -38,6 +38,7 @@ module.exports = (phase) => {
 
   return {
     env,
+    trailingSlash: true,
     images: {
       domains: [
         'avatars.githubusercontent.com',
