@@ -20,17 +20,17 @@ module.exports = (phase) => {
   const redirects = async () => {
     return [
       {
-        source: '/:profile/followers',
+        source: '/:profile/followers/',
         destination: '/:profile',
         permanent: false,
       },
       {
-        source: '/:profile/following',
+        source: '/:profile/following/',
         destination: '/:profile',
         permanent: false,
       },
       {
-        source: '/inbox/:userId',
+        source: '/inbox/:userId/',
         destination: '/inbox',
         permanent: false,
       },
@@ -39,7 +39,7 @@ module.exports = (phase) => {
 
   return {
     env,
-    trailingSlash: false,
+    trailingSlash: true,
     images: {
       domains: [
         'avatars.githubusercontent.com',
