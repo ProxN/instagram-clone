@@ -11,6 +11,7 @@ const withUser = <P extends Record<string, unknown>>(
   return (props: P) => {
     const { data: user, isLoading } = useMeQuery(client, undefined, {
       staleTime: 1000 * 60 * 60 * 24,
+      retry: false,
     });
     const router = useRouter();
 

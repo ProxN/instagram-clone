@@ -6,6 +6,7 @@ import { useGetPostQuery } from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { useGetComments } from '@lib/hooks/useGetComments';
 import { PostCardLoader } from '@components/elements/PostCardLoader';
+import { withUser } from '@lib/utility/withUser';
 
 const Post = () => {
   const router = useRouter();
@@ -60,4 +61,4 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default withUser(Post);

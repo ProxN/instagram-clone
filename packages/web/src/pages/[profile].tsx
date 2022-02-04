@@ -1,8 +1,7 @@
 import Error from 'next/error';
 import { useRouter } from 'next/router';
-import { NextPageContext } from 'next';
 import NextLink from 'next/link';
-import { QueryClient, dehydrate, useQueryClient } from 'react-query';
+import { useQueryClient } from 'react-query';
 import { Avatar } from '@components/elements/Avatar';
 import { Button } from '@components/elements/Button';
 import { Icon } from '@components/elements/Icon';
@@ -28,6 +27,8 @@ import FollowingModal from '@components/templates/FollowingModal/FollowingModal'
 import { UnFollowModal } from '@components/elements/UnFollowModal';
 import { useState } from 'react';
 import { SavedPosts } from '@components/templates/SavedPosts';
+import { withUser } from '@lib/utility/withUser';
+import { profile } from 'console';
 
 type Tabs = 'posts' | 'saved';
 
@@ -459,4 +460,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default withUser(Profile);

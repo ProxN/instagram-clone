@@ -13,14 +13,14 @@ import { Avatar } from '@components/elements/Avatar';
 import { Text } from '@components/elements/Text';
 import { Notification } from '@components/templates/Notification';
 import { useLogout } from '@lib/hooks/useLogout';
-import { useGetUnreadMessagesCountQuery } from '@lib/graphql';
+import {
+  MeQuery,
+  useGetUnreadMessagesCountQuery,
+  useMeQuery,
+} from '@lib/graphql';
 import { client } from '@lib/utility/graphqlClient';
 import { useUnreadMessages } from '@lib/hooks/useUnReadMessages';
-
-interface HeaderProps {
-  avatar?: string | null;
-  username: string;
-}
+import { useQueryClient } from 'react-query';
 
 const FadeConfig = {
   enter: {
@@ -35,7 +35,7 @@ const FadeConfig = {
   },
 };
 
-const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
+const Header: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const router = useRouter();
@@ -43,6 +43,11 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
   const { data } = useGetUnreadMessagesCountQuery(client, undefined, {
     refetchOnWindowFocus: false,
   });
+  const queryClient = useQueryClient();
+
+  const user = queryClient.getQueryData<MeQuery>(useMeQuery.getKey());
+  if (!user) return null;
+
   useUnreadMessages();
 
   useEffect(() => {
@@ -239,7 +244,7 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
                       borderColor='blackAlpha.1'
                     >
                       <Flex flexDirection='column' fontSize='1.6rem'>
-                        <NextLink href={`/${username}`}>
+                        <NextLink href={`/${user?.me?.username}`}>
                           <Flex
                             backgroundColor={{ hover: 'gray.0' }}
                             cursor='pointer'
@@ -299,7 +304,7 @@ const Header: React.FC<HeaderProps> = ({ avatar, username }) => {
             >
               <div>
                 <Avatar
-                  src={avatar || '/default.jpg'}
+                  src={user?.me?.avatar || '/default.jpg'}
                   onClick={() => setShowAvatarMenu(!showAvatarMenu)}
                 />
               </div>

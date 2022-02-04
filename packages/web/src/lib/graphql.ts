@@ -293,6 +293,7 @@ export type Query = {
   getUserProfile?: Maybe<User>;
   me?: Maybe<User>;
   searchUsers?: Maybe<Array<User>>;
+  status: Status;
   userFeeds: PostsResponse;
 };
 
@@ -362,6 +363,11 @@ export type StatsResponse = {
   followers?: Maybe<Scalars['Float']>;
   following?: Maybe<Scalars['Float']>;
   posts?: Maybe<Scalars['Float']>;
+};
+
+export type Status = {
+  __typename?: 'Status';
+  value: Scalars['String'];
 };
 
 export type Subscription = {
@@ -990,6 +996,13 @@ export type SearchUsersQuery = {
       }>
     | null
     | undefined;
+};
+
+export type StatusQueryVariables = Exact<{ [key: string]: never }>;
+
+export type StatusQuery = {
+  __typename?: 'Query';
+  status: { __typename?: 'Status'; value: string };
 };
 
 export type GetUserConversationQueryVariables = Exact<{
@@ -2575,6 +2588,64 @@ useSearchUsersQuery.fetcher = (
   fetcher<SearchUsersQuery, SearchUsersQueryVariables>(
     client,
     SearchUsersDocument,
+    variables,
+    headers
+  );
+export const StatusDocument = `
+    query Status {
+  status {
+    value
+  }
+}
+    `;
+export const useStatusQuery = <TData = StatusQuery, TError = unknown>(
+  client: GraphQLClient,
+  variables?: StatusQueryVariables,
+  options?: UseQueryOptions<StatusQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useQuery<StatusQuery, TError, TData>(
+    variables === undefined ? ['Status'] : ['Status', variables],
+    fetcher<StatusQuery, StatusQueryVariables>(
+      client,
+      StatusDocument,
+      variables,
+      headers
+    ),
+    options
+  );
+
+useStatusQuery.getKey = (variables?: StatusQueryVariables) =>
+  variables === undefined ? ['Status'] : ['Status', variables];
+export const useInfiniteStatusQuery = <TData = StatusQuery, TError = unknown>(
+  pageParamKey: keyof StatusQueryVariables,
+  client: GraphQLClient,
+  variables?: StatusQueryVariables,
+  options?: UseInfiniteQueryOptions<StatusQuery, TError, TData>,
+  headers?: RequestInit['headers']
+) =>
+  useInfiniteQuery<StatusQuery, TError, TData>(
+    variables === undefined
+      ? ['Status.infinite']
+      : ['Status.infinite', variables],
+    (metaData) =>
+      fetcher<StatusQuery, StatusQueryVariables>(
+        client,
+        StatusDocument,
+        { ...variables, ...(metaData.pageParam ?? {}) },
+        headers
+      )(),
+    options
+  );
+
+useStatusQuery.fetcher = (
+  client: GraphQLClient,
+  variables?: StatusQueryVariables,
+  headers?: RequestInit['headers']
+) =>
+  fetcher<StatusQuery, StatusQueryVariables>(
+    client,
+    StatusDocument,
     variables,
     headers
   );

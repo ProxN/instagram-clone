@@ -8,6 +8,7 @@ import ChatBox from '@components/templates/ChatBox/ChatBox';
 import { InboxLayout } from '@components/templates/InboxLayout';
 import { SendMessageModal } from '@components/templates/SendMessageModal';
 import { useDisclosure } from '@lib/hooks/useDisclosure';
+import { withUser } from '@lib/utility/withUser';
 
 const Inbox = () => {
   const router = useRouter();
@@ -51,4 +52,4 @@ const Inbox = () => {
   );
 };
 
-export default Inbox;
+export default withUser(Inbox);

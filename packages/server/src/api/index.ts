@@ -14,6 +14,7 @@ import commentResolver from './comment/comment-resolver';
 import likeResolver from './like/like-resolver';
 import messageResolver from './message/message-resolver';
 import bookMarkResolver from './bookmark/bookmark-resolver';
+import serverStatus from './status/status-resolver';
 
 export const entities = [
   userEntity,
@@ -34,4 +35,5 @@ export const resolvers = [
   likeResolver,
   messageResolver,
   bookMarkResolver,
+  serverStatus,
 ] as const;
