@@ -46,7 +46,6 @@ const Header: React.FC = () => {
   const queryClient = useQueryClient();
 
   const user = queryClient.getQueryData<MeQuery>(useMeQuery.getKey());
-  if (!user) return null;
 
   useUnreadMessages();
 

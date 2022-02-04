@@ -3,6 +3,7 @@ const {
   PHASE_DEVELOPMENT_SERVER,
   PHASE_PRODUCTION_BUILD,
 } = require('next/constants');
+const path = require('path');
 
 module.exports = (phase) => {
   const IS_DEV = phase === PHASE_DEVELOPMENT_SERVER;
@@ -38,7 +39,7 @@ module.exports = (phase) => {
 
   return {
     env,
-    trailingSlash: true,
+    trailingSlash: false,
     images: {
       domains: [
         'avatars.githubusercontent.com',
@@ -60,6 +61,8 @@ module.exports = (phase) => {
         '@xstyled/styled-components':
           '@xstyled/styled-components/dist/index.js',
       };
+
+      config.resolve.modules.push(path.resolve('/'));
 
       return config;
     },
