@@ -79,7 +79,7 @@ export const Header: React.FC<HeaderProps> = () => {
             justifyContent={{ md: 'flex-end' }}
             alignItems='center'
           >
-            <Box
+            {/* <Box
               mt={{ xs: '1rem', md: '0' }}
               as='form'
               w={{ xs: '100%', md: '25rem' }}
@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = () => {
                 icon={<Icon name='search' />}
                 defaultValue=''
               />
-            </Box>
+            </Box> */}
             {/* Links */}
             <Space
               justifyContent={{ xs: 'space-between', md: 'flex-end' }}
@@ -170,7 +170,7 @@ export const Header: React.FC<HeaderProps> = () => {
                   />
                 </li>
               </NextLink>
-              <NextLink href='/explore'>
+              {/* <NextLink href='/explore'>
                 <li>
                   <IconButton
                     size='sm'
@@ -180,7 +180,7 @@ export const Header: React.FC<HeaderProps> = () => {
                     icon={<Icon name='compass' />}
                   />
                 </li>
-              </NextLink>
+              </NextLink> */}
               <Notification />
             </Space>
           </Box>
